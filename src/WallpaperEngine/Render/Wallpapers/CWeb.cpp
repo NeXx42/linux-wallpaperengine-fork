@@ -13,12 +13,10 @@ using namespace WallpaperEngine::Render::Wallpapers;
 using namespace WallpaperEngine::WebBrowser;
 using namespace WallpaperEngine::WebBrowser::CEF;
 
-CWeb::CWeb (
-    const Wallpaper& wallpaper, RenderContext& context, AudioContext& audioContext,
-    WebBrowserContext& browserContext, const WallpaperState::TextureUVsScaling& scalingMode,
-    const uint32_t& clampMode
-) :
-    CWallpaper (wallpaper, context, audioContext, scalingMode, clampMode),
+CWeb::CWeb (const Wallpaper& wallpaper, RenderContext& context, AudioContext& audioContext,
+            WebBrowserContext& browserContext, const WallpaperState::TextureUVsScaling& scalingMode,
+            const uint32_t& clampMode, const glm::vec2& uvOffset) :
+    CWallpaper (wallpaper, context, audioContext, scalingMode, clampMode, uvOffset),
     m_browserContext (browserContext) {
     // setup framebuffers
     this->setupFramebuffers ();
@@ -34,10 +32,8 @@ CWeb::CWeb (
 
     this->m_client = new WebBrowser::CEF::BrowserClient (m_renderHandler);
     // use the custom scheme for the wallpaper's files
-    const std::string htmlURL =
-        WPSchemeHandlerFactory::generateSchemeName(this->getWeb ().project.workshopId) +
-        "://root/" +
-        this->getWeb().filename;
+    const std::string htmlURL = WPSchemeHandlerFactory::generateSchemeName (this->getWeb ().project.workshopId) +
+                                "://root/" + this->getWeb ().filename;
     this->m_browser =
         CefBrowserHost::CreateBrowserSync (window_info, this->m_client, htmlURL, browserSettings, nullptr, nullptr);
 }
@@ -88,8 +84,8 @@ void CWeb::updateMouse (const glm::ivec4& viewport) {
     auto& input = this->getContext ().getInputContext ().getMouseInput ();
 
     const glm::dvec2 position = input.position ();
-    const auto leftClick = input.leftClick();
-    const auto rightClick = input.rightClick();
+    const auto leftClick = input.leftClick ();
+    const auto rightClick = input.rightClick ();
 
     CefMouseEvent evt;
     // Set mouse current position. Maybe clamps are not needed
@@ -101,11 +97,15 @@ void CWeb::updateMouse (const glm::ivec4& viewport) {
 
     // TODO: ANY OTHER MOUSE EVENTS TO SEND?
     if (leftClick != this->m_leftClick) {
-        this->m_browser->GetHost ()->SendMouseClickEvent (evt, CefBrowserHost::MouseButtonType::MBT_LEFT, leftClick == WallpaperEngine::Input::MouseClickStatus::Released, 1);
+        this->m_browser->GetHost ()->SendMouseClickEvent (
+            evt, CefBrowserHost::MouseButtonType::MBT_LEFT,
+            leftClick == WallpaperEngine::Input::MouseClickStatus::Released, 1);
     }
 
     if (rightClick != this->m_rightClick) {
-        this->m_browser->GetHost ()->SendMouseClickEvent (evt, CefBrowserHost::MouseButtonType::MBT_RIGHT, rightClick == WallpaperEngine::Input::MouseClickStatus::Released, 1);
+        this->m_browser->GetHost ()->SendMouseClickEvent (
+            evt, CefBrowserHost::MouseButtonType::MBT_RIGHT,
+            rightClick == WallpaperEngine::Input::MouseClickStatus::Released, 1);
     }
 
     this->m_leftClick = leftClick;

@@ -34,25 +34,26 @@ using namespace WallpaperEngine::FileSystem;
 
 class CWallpaper : public Helpers::ContextAware, public FBOProvider {
     friend class WallpaperEngine::Application::WallpaperApplication;
+
   public:
     template <class T> [[nodiscard]] const T* as () const {
-        if (is <T> ()) {
-            return static_cast <const T*> (this);
+        if (is<T> ()) {
+            return static_cast<const T*> (this);
         }
 
         throw std::bad_cast ();
     }
 
     template <class T> [[nodiscard]] T* as () {
-        if (is <T> ()) {
-            return static_cast <T*> (this);
+        if (is<T> ()) {
+            return static_cast<T*> (this);
         }
 
         throw std::bad_cast ();
     }
 
     template <class T> [[nodiscard]] bool is () const {
-        return typeid (*this) == typeid(T);
+        return typeid (*this) == typeid (T);
     }
 
     virtual ~CWallpaper () override;
@@ -135,16 +136,16 @@ class CWallpaper : public Helpers::ContextAware, public FBOProvider {
      *
      * @return
      */
-    static std::unique_ptr<CWallpaper> fromWallpaper (
-        const Wallpaper& wallpaper, RenderContext& context, AudioContext& audioContext,
-        WebBrowser::WebBrowserContext* browserContext, const WallpaperState::TextureUVsScaling& scalingMode,
-        const uint32_t& clampMode);
+    static std::unique_ptr<CWallpaper> fromWallpaper (const Wallpaper& wallpaper, RenderContext& context,
+                                                      AudioContext& audioContext,
+                                                      WebBrowser::WebBrowserContext* browserContext,
+                                                      const WallpaperState::TextureUVsScaling& scalingMode,
+                                                      const uint32_t& clampMode, const glm::vec2& uvOffset);
 
   protected:
-    CWallpaper (
-        const Wallpaper& wallpaperData, RenderContext& context,
-        AudioContext& audioContext, const WallpaperState::TextureUVsScaling& scalingMode,
-        const uint32_t& clampMode);
+    CWallpaper (const Wallpaper& wallpaperData, RenderContext& context, AudioContext& audioContext,
+                const WallpaperState::TextureUVsScaling& scalingMode, const uint32_t& clampMode,
+                const glm::vec2& uvOffset);
 
     /**
      * Renders a frame of the wallpaper

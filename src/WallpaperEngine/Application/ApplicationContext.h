@@ -3,8 +3,8 @@
 #include <cstdint>
 #include <filesystem>
 #include <map>
-#include <string>
 #include <optional>
+#include <string>
 #include <vector>
 
 #include <glm/vec4.hpp>
@@ -19,6 +19,7 @@
 
 namespace WallpaperEngine::Application {
 using namespace WallpaperEngine::Data::Assets;
+
 /**
  * Application information as parsed off the command line arguments
  */
@@ -81,6 +82,8 @@ class ApplicationContext {
             std::map<std::string, PlaylistDefinition> screenPlaylists;
             /** Playlist used in window mode */
             std::optional<PlaylistDefinition> defaultPlaylist;
+            /** UV offsets */
+            std::map<std::string, glm::vec2> uvOffset;
         } general;
 
         /**
@@ -109,6 +112,7 @@ class ApplicationContext {
                 glm::ivec4 geometry;
                 TextureFlags clamp;
                 WallpaperEngine::Render::WallpaperState::TextureUVsScaling scalingMode;
+                glm::vec2 uvOffset;
             } window;
         } render;
 
@@ -148,51 +152,57 @@ class ApplicationContext {
             std::filesystem::path path;
         } screenshot;
     } settings = {
-        .general = {
-            .onlyListProperties = false,
-            .dumpStructure = false,
-            .assets = "",
-            .defaultBackground = "",
-            .screenBackgrounds = {},
-            .properties = {},
-            .screenScalings = {},
-            .screenClamps = {},
-            .screenPlaylists = {},
-            .defaultPlaylist = std::nullopt,
-        },
-        .render = {
-            .mode = NORMAL_WINDOW,
-            .maximumFPS = 30,
-            .pauseOnFullscreen = true,
-            .pauseOnFullscreenOnlyWhenActive = false,
-            .fullscreenPauseIgnoreAppIds = {},
-            .window = {
-                .geometry = {},
-                .clamp = TextureFlags_ClampUVs,
-                .scalingMode = WallpaperEngine::Render::WallpaperState::TextureUVsScaling::DefaultUVs,
+        .general =
+            {
+                .onlyListProperties = false,
+                .dumpStructure = false,
+                .assets = "",
+                .defaultBackground = "",
+                .screenBackgrounds = {},
+                .properties = {},
+                .screenScalings = {},
+                .screenClamps = {},
+                .screenPlaylists = {},
+                .defaultPlaylist = std::nullopt,
             },
-        },
-        .audio = {
-            .enabled = true,
-            .volume = 15,
-            .automute = true,
-            .audioprocessing = true,
-        },
-        .mouse = {
-            .enabled = true,
-            .disableparallax = false,
-        },
-        .screenshot = {
-            .take = false,
-            .delay = 5,
-            .path = "",
-        },
+        .render =
+            {
+                .mode = NORMAL_WINDOW,
+                .maximumFPS = 30,
+                .pauseOnFullscreen = true,
+                .pauseOnFullscreenOnlyWhenActive = false,
+                .fullscreenPauseIgnoreAppIds = {},
+                .window =
+                    {
+                        .geometry = {},
+                        .clamp = TextureFlags_ClampUVs,
+                        .scalingMode = WallpaperEngine::Render::WallpaperState::TextureUVsScaling::DefaultUVs,
+                    },
+            },
+        .audio =
+            {
+                .enabled = true,
+                .volume = 15,
+                .automute = true,
+                .audioprocessing = true,
+            },
+        .mouse =
+            {
+                .enabled = true,
+                .disableparallax = false,
+            },
+        .screenshot =
+            {
+                .take = false,
+                .delay = 5,
+                .path = "",
+            },
     };
 
     ApplicationState state;
 
-    [[nodiscard]] int getArgc() const;
-    [[nodiscard]] char** getArgv() const;
+    [[nodiscard]] int getArgc () const;
+    [[nodiscard]] char** getArgv () const;
 
   private:
     /** Program argument count on startup */

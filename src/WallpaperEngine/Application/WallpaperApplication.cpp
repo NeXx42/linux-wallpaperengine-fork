@@ -37,55 +37,44 @@ using namespace WallpaperEngine::Application;
 using namespace WallpaperEngine::Data::Model;
 using namespace WallpaperEngine::FileSystem;
 
-void CustomGLDebugCallback(GLenum source,
-            GLenum type,
-            GLuint id,
-            GLenum severity,
-            GLsizei length,
-            const GLchar *message,
-            const void *userParam) {
+void CustomGLDebugCallback (GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
+                            const GLchar* message, const void* userParam) {
     if (severity != GL_DEBUG_SEVERITY_HIGH) {
         return;
     }
 
-    sLog.error("OpenGL error: ", message, ", type: ", type, ", id: ", id);
+    sLog.error ("OpenGL error: ", message, ", type: ", type, ", id: ", id);
 
     std::vector<WallpaperEngine::Debugging::CallStack::CallInfo> callInfo;
 
-    WallpaperEngine::Debugging::CallStack::GetCalls(callInfo);
+    WallpaperEngine::Debugging::CallStack::GetCalls (callInfo);
 
-    for(std::vector<WallpaperEngine::Debugging::CallStack::CallInfo>::size_type i = 0; i < callInfo.size(); ++i) {
-        fprintf(stderr,
-            "[%3lu] %15lu: %s in %s\n",
-            callInfo.size()-i,
-            callInfo[i].offset,
-            callInfo[i].function.c_str(),
-            callInfo[i].module.c_str()
-        );
+    for (std::vector<WallpaperEngine::Debugging::CallStack::CallInfo>::size_type i = 0; i < callInfo.size (); ++i) {
+        fprintf (stderr, "[%3lu] %15lu: %s in %s\n", callInfo.size () - i, callInfo [i].offset,
+                 callInfo [i].function.c_str (), callInfo [i].module.c_str ());
     }
 }
 
-WallpaperApplication::WallpaperApplication (ApplicationContext& context) :
-    m_context (context) {
+WallpaperApplication::WallpaperApplication (ApplicationContext& context) : m_context (context) {
     this->loadBackgrounds ();
     this->setupProperties ();
-    this->setupBrowser();
+    this->setupBrowser ();
     this->initializePlaylists ();
 }
 
 AssetLocatorUniquePtr WallpaperApplication::setupAssetLocator (const std::string& bg) const {
-    auto container = std::make_unique <Container> ();
+    auto container = std::make_unique<Container> ();
 
     const std::filesystem::path path = bg;
 
     container->mount (path, "/");
     try {
         container->mount (path / "scene.pkg", "/");
-    } catch (std::runtime_error&) { }
+    } catch (std::runtime_error&) {}
 
     try {
         container->mount (path / "gifscene.pkg", "/");
-    } catch (std::runtime_error&) { }
+    } catch (std::runtime_error&) {}
 
     try {
         container->mount (this->m_context.settings.general.assets, "/");
@@ -104,129 +93,51 @@ AssetLocatorUniquePtr WallpaperApplication::setupAssetLocator (const std::string
     // add the effect file for screen bloom
 
     // add some model for the image element even if it's going to waste rendering cycles
-    vfs.add (
-        "effects/wpenginelinux/bloomeffect.json",
-        {
-            {"name", "camerabloom_wpengine_linux"},
-            {"group", "wpengine_linux_camera"},
-            {"dependencies", JSON::array ()},
-            {"passes",
-                JSON::array (
-                    {
-                        {
-                            {"material", "materials/util/downsample_quarter_bloom.json"},
-                            {"target", "_rt_4FrameBuffer"},
-                            {
-                                "bind",
-                                JSON::array (
-                                    {
-                                        {
-                                            {"name", "_rt_FullFrameBuffer"},
-                                            {"index", 0}
-                                        }
-                                    }
-                                )
-                            }
-                        },
-                        {
-                            {"material", "materials/util/downsample_eighth_blur_v.json"},
-                            {"target", "_rt_8FrameBuffer"},
-                            {
-                                "bind",
-                                JSON::array (
-                                    {
-                                        {
-                                            {"name", "_rt_4FrameBuffer"},
-                                            {"index", 0}
-                                        }
-                                    }
-                                )
-                            }
-                        },
-                        {
-                            {"material", "materials/util/blur_h_bloom.json"},
-                            {"target", "_rt_Bloom"},
-                            {
-                                "bind",
-                                JSON::array (
-                                    {
-                                        {
-                                            {"name", "_rt_8FrameBuffer"},
-                                            {"index", 0}
-                                        }
-                                    }
-                                )
-                            }
-                        },
-                        {
-                            {"material", "materials/util/combine.json"},
-                            {"target", "_rt_FullFrameBuffer"},
-                            {
-                                "bind",
-                                JSON::array (
-                                    {
-                                        {
-                                            {"name", "_rt_imageLayerComposite_-1_a"},
-                                            {"index", 0}
-                                        },
-                                        {
-                                            {"name", "_rt_Bloom"},
-                                            {"index", 1}
-                                        }
-                                    }
-                                )
-                            }
-                        }
-                    }
-               ),
-            }
-        }
-    );
+    vfs.add ("effects/wpenginelinux/bloomeffect.json",
+             {{"name", "camerabloom_wpengine_linux"},
+              {"group", "wpengine_linux_camera"},
+              {"dependencies", JSON::array ()},
+              {
+                  "passes",
+                  JSON::array ({{{"material", "materials/util/downsample_quarter_bloom.json"},
+                                 {"target", "_rt_4FrameBuffer"},
+                                 {"bind", JSON::array ({{{"name", "_rt_FullFrameBuffer"}, {"index", 0}}})}},
+                                {{"material", "materials/util/downsample_eighth_blur_v.json"},
+                                 {"target", "_rt_8FrameBuffer"},
+                                 {"bind", JSON::array ({{{"name", "_rt_4FrameBuffer"}, {"index", 0}}})}},
+                                {{"material", "materials/util/blur_h_bloom.json"},
+                                 {"target", "_rt_Bloom"},
+                                 {"bind", JSON::array ({{{"name", "_rt_8FrameBuffer"}, {"index", 0}}})}},
+                                {{"material", "materials/util/combine.json"},
+                                 {"target", "_rt_FullFrameBuffer"},
+                                 {"bind", JSON::array ({{{"name", "_rt_imageLayerComposite_-1_a"}, {"index", 0}},
+                                                        {{"name", "_rt_Bloom"}, {"index", 1}}})}}}),
+              }});
 
-    vfs.add (
-        "models/wpenginelinux.json",
-        {
-            {"material","materials/wpenginelinux.json"}
-        }
-    );
+    vfs.add ("models/wpenginelinux.json", {{"material", "materials/wpenginelinux.json"}});
 
-    vfs.add(
-        "materials/wpenginelinux.json",
-        {
-            {"passes", JSON::array (
-                {
-                    {
-                        {"blending", "normal"},
-                        {"cullmode", "nocull"},
-                        {"depthtest", "disabled"},
-                        {"depthwrite", "disabled"},
-                        {"shader", "genericimage2"},
-                        {"textures", JSON::array ({"_rt_FullFrameBuffer"})}
-                    }
-                }
-            )}}
-    );
+    vfs.add ("materials/wpenginelinux.json",
+             {{"passes", JSON::array ({{{"blending", "normal"},
+                                        {"cullmode", "nocull"},
+                                        {"depthtest", "disabled"},
+                                        {"depthwrite", "disabled"},
+                                        {"shader", "genericimage2"},
+                                        {"textures", JSON::array ({"_rt_FullFrameBuffer"})}}})}});
 
-    vfs.add(
-        "shaders/commands/copy.frag",
-        "uniform sampler2D g_Texture0;\n"
-        "in vec2 v_TexCoord;\n"
-        "void main () {\n"
-        "out_FragColor = texture (g_Texture0, v_TexCoord);\n"
-        "}"
-    );
-    vfs.add(
-        "shaders/commands/copy.vert",
-        "in vec3 a_Position;\n"
-        "in vec2 a_TexCoord;\n"
-        "out vec2 v_TexCoord;\n"
-        "void main () {\n"
-        "gl_Position = vec4 (a_Position, 1.0);\n"
-        "v_TexCoord = a_TexCoord;\n"
-        "}"
-    );
+    vfs.add ("shaders/commands/copy.frag", "uniform sampler2D g_Texture0;\n"
+                                           "in vec2 v_TexCoord;\n"
+                                           "void main () {\n"
+                                           "out_FragColor = texture (g_Texture0, v_TexCoord);\n"
+                                           "}");
+    vfs.add ("shaders/commands/copy.vert", "in vec3 a_Position;\n"
+                                           "in vec2 a_TexCoord;\n"
+                                           "out vec2 v_TexCoord;\n"
+                                           "void main () {\n"
+                                           "gl_Position = vec4 (a_Position, 1.0);\n"
+                                           "v_TexCoord = a_TexCoord;\n"
+                                           "}");
 
-    return std::make_unique <AssetLocator> (std::move (container));
+    return std::make_unique<AssetLocator> (std::move (container));
 }
 
 void WallpaperApplication::loadBackgrounds () {
@@ -257,7 +168,7 @@ ProjectUniquePtr WallpaperApplication::loadBackground (const std::string& bg) {
     auto container = this->setupAssetLocator (bg);
     auto json = WallpaperEngine::Data::JSON::JSON::parse (container->readString ("project.json"));
 
-    return WallpaperEngine::Data::Parsers::ProjectParser::parse (json, std::move(container));
+    return WallpaperEngine::Data::Parsers::ProjectParser::parse (json, std::move (container));
 }
 
 std::vector<std::size_t> WallpaperApplication::buildPlaylistOrder (
@@ -281,8 +192,8 @@ void WallpaperApplication::initializePlaylists () {
 
     const auto now = std::chrono::steady_clock::now ();
 
-    auto registerPlaylist = [this, now](const std::string& key, const ApplicationContext::PlaylistDefinition& playlist,
-                                        std::optional<std::filesystem::path> currentPath) {
+    auto registerPlaylist = [this, now] (const std::string& key, const ApplicationContext::PlaylistDefinition& playlist,
+                                         std::optional<std::filesystem::path> currentPath) {
         if (playlist.items.empty ())
             return;
 
@@ -297,7 +208,7 @@ void WallpaperApplication::initializePlaylists () {
         if (currentPath.has_value ()) {
             state.orderIndex = 0;
 
-            for (std::size_t i = 0; i < state.order.size (); i ++) {
+            for (std::size_t i = 0; i < state.order.size (); i++) {
                 if (playlist.items [state.order [i]] == currentPath.value ()) {
                     state.orderIndex = i;
                     break;
@@ -312,21 +223,21 @@ void WallpaperApplication::initializePlaylists () {
         this->m_activePlaylists.insert_or_assign (key, std::move (state));
     };
 
-    if (hasDefaultPlaylist &&
-        (this->m_context.settings.render.mode == ApplicationContext::NORMAL_WINDOW ||
-         this->m_context.settings.render.mode == ApplicationContext::EXPLICIT_WINDOW)) {
+    if (hasDefaultPlaylist && (this->m_context.settings.render.mode == ApplicationContext::NORMAL_WINDOW ||
+                               this->m_context.settings.render.mode == ApplicationContext::EXPLICIT_WINDOW)) {
         const auto& playlist = this->m_context.settings.general.defaultPlaylist.value ();
-        const auto currentPath = playlist.items.empty ()
-            ? std::optional<std::filesystem::path> {this->m_context.settings.general.defaultBackground}
-            : std::optional<std::filesystem::path> {playlist.items.front ()};
+        const auto currentPath =
+            playlist.items.empty ()
+                ? std::optional<std::filesystem::path> {this->m_context.settings.general.defaultBackground}
+                : std::optional<std::filesystem::path> {playlist.items.front ()};
         registerPlaylist ("default", playlist, currentPath);
     }
 
     for (const auto& [screen, playlist] : this->m_context.settings.general.screenPlaylists) {
         const auto current = this->m_context.settings.general.screenBackgrounds.find (screen);
         const auto currentPath = current != this->m_context.settings.general.screenBackgrounds.end ()
-            ? std::optional<std::filesystem::path> {current->second}
-            : std::nullopt;
+                                     ? std::optional<std::filesystem::path> {current->second}
+                                     : std::nullopt;
         registerPlaylist (screen, playlist, currentPath);
     }
 }
@@ -336,7 +247,7 @@ void WallpaperApplication::ensureBrowserForProject (const Project& project) {
         return;
 
     if (!this->m_browserContext) {
-        this->m_browserContext = std::make_unique <WebBrowser::WebBrowserContext> (*this);
+        this->m_browserContext = std::make_unique<WebBrowser::WebBrowserContext> (*this);
     }
 }
 
@@ -391,9 +302,8 @@ bool WallpaperApplication::selectNextCandidate (ActivePlaylist& playlist, std::s
     return false;
 }
 
-void WallpaperApplication::advancePlaylist (
-    const std::string& screen, ActivePlaylist& playlist,
-    const std::chrono::steady_clock::time_point& now) {
+void WallpaperApplication::advancePlaylist (const std::string& screen, ActivePlaylist& playlist,
+                                            const std::chrono::steady_clock::time_point& now) {
     if (playlist.order.empty ())
         return;
 
@@ -446,23 +356,22 @@ void WallpaperApplication::advancePlaylist (
 
         const auto scalingIt = this->m_context.settings.general.screenScalings.find (screen);
         const auto clampIt = this->m_context.settings.general.screenClamps.find (screen);
+        const auto uvOffsetsIt = this->m_context.settings.general.uvOffset.find (screen);
         const auto scaling = scalingIt != this->m_context.settings.general.screenScalings.end ()
                                  ? scalingIt->second
                                  : this->m_context.settings.render.window.scalingMode;
         const auto clamp = clampIt != this->m_context.settings.general.screenClamps.end ()
                                ? clampIt->second
                                : this->m_context.settings.render.window.clamp;
+        const auto uvOffsets = uvOffsetsIt != this->m_context.settings.general.uvOffset.end ()
+                                   ? uvOffsetsIt->second
+                                   : this->m_context.settings.render.window.uvOffset;
 
         if (this->m_renderContext) {
-            this->m_renderContext->setWallpaper (
-                screen,
-                WallpaperEngine::Render::CWallpaper::fromWallpaper (
-                    *this->m_backgrounds [screen]->wallpaper,
-                    *this->m_renderContext, *this->m_audioContext, this->m_browserContext.get (),
-                    scaling,
-                    clamp
-                )
-            );
+            this->m_renderContext->setWallpaper (screen, WallpaperEngine::Render::CWallpaper::fromWallpaper (
+                                                             *this->m_backgrounds [screen]->wallpaper,
+                                                             *this->m_renderContext, *this->m_audioContext,
+                                                             this->m_browserContext.get (), scaling, clamp, uvOffsets));
         }
 
         this->m_context.settings.general.screenBackgrounds [screen] = nextPath;
@@ -528,19 +437,17 @@ void WallpaperApplication::setupProperties () {
 }
 
 void WallpaperApplication::setupBrowser () {
-    bool anyWebProject = std::any_of (
-        this->m_backgrounds.begin (), this->m_backgrounds.end (),
-        [](const std::pair<const std::string, ProjectUniquePtr>& pair) -> bool {
-            return pair.second->wallpaper->is<Web> ();
-        }
-    );
+    bool anyWebProject = std::any_of (this->m_backgrounds.begin (), this->m_backgrounds.end (),
+                                      [] (const std::pair<const std::string, ProjectUniquePtr>& pair) -> bool {
+                                          return pair.second->wallpaper->is<Web> ();
+                                      });
 
     // do not perform any initialization if no web background is present
     if (!anyWebProject || this->m_browserContext) {
         return;
     }
 
-    this->m_browserContext = std::make_unique <WebBrowser::WebBrowserContext> (*this);
+    this->m_browserContext = std::make_unique<WebBrowser::WebBrowserContext> (*this);
 }
 
 void WallpaperApplication::takeScreenshot (const std::filesystem::path& filename) const {
@@ -557,7 +464,8 @@ void WallpaperApplication::takeScreenshot (const std::filesystem::path& filename
         // activate opengl context so we can read from the framebuffer
         viewport->makeCurrent ();
         // make room for storing the pixel of this viewport
-        const auto bufferSize = (viewport->viewport.z - viewport->viewport.x) * (viewport->viewport.w - viewport->viewport.y) * 3;
+        const auto bufferSize =
+            (viewport->viewport.z - viewport->viewport.x) * (viewport->viewport.w - viewport->viewport.y) * 3;
         auto* buffer = new uint8_t [bufferSize];
         const uint8_t* pixel = buffer;
 
@@ -620,75 +528,76 @@ void WallpaperApplication::setupOutput () {
     sLog.debug ("Checking for window servers: ");
 
     for (const auto& windowServer : sVideoFactories.getRegisteredDrivers ()) {
-        sLog.debug("\t", windowServer);
+        sLog.debug ("\t", windowServer);
     }
 
-    this->m_videoDriver = sVideoFactories.createVideoDriver (
-        this->m_context.settings.render.mode, XDG_SESSION_TYPE, this->m_context, *this);
-    this->m_fullScreenDetector = sVideoFactories.createFullscreenDetector (XDG_SESSION_TYPE, this->m_context, *this->m_videoDriver);
+    this->m_videoDriver = sVideoFactories.createVideoDriver (this->m_context.settings.render.mode, XDG_SESSION_TYPE,
+                                                             this->m_context, *this);
+    this->m_fullScreenDetector =
+        sVideoFactories.createFullscreenDetector (XDG_SESSION_TYPE, this->m_context, *this->m_videoDriver);
 }
 
 void WallpaperApplication::setupAudio () {
     // ensure audioprocessing is required by any background, and we have it enabled
     const bool audioProcessingRequired = std::ranges::any_of (
-        this->m_backgrounds,
-        [](const std::pair<const std::string, ProjectUniquePtr>& pair) -> bool {
+        this->m_backgrounds, [] (const std::pair<const std::string, ProjectUniquePtr>& pair) -> bool {
             return pair.second->supportsAudioProcessing;
-        }
-    );
+        });
 
     if (audioProcessingRequired && this->m_context.settings.audio.audioprocessing) {
-        this->m_audioRecorder = std::make_unique <WallpaperEngine::Audio::Drivers::Recorders::PulseAudioPlaybackRecorder> ();
+        this->m_audioRecorder =
+            std::make_unique<WallpaperEngine::Audio::Drivers::Recorders::PulseAudioPlaybackRecorder> ();
     } else {
-        this->m_audioRecorder = std::make_unique <WallpaperEngine::Audio::Drivers::Recorders::PlaybackRecorder> ();
+        this->m_audioRecorder = std::make_unique<WallpaperEngine::Audio::Drivers::Recorders::PlaybackRecorder> ();
     }
 
     if (this->m_context.settings.audio.automute) {
-        m_audioDetector = std::make_unique <WallpaperEngine::Audio::Drivers::Detectors::PulseAudioPlayingDetector> (this->m_context, *this->m_fullScreenDetector);
+        m_audioDetector = std::make_unique<WallpaperEngine::Audio::Drivers::Detectors::PulseAudioPlayingDetector> (
+            this->m_context, *this->m_fullScreenDetector);
     } else {
-        m_audioDetector = std::make_unique <WallpaperEngine::Audio::Drivers::Detectors::AudioPlayingDetector> (this->m_context, *this->m_fullScreenDetector);
+        m_audioDetector = std::make_unique<WallpaperEngine::Audio::Drivers::Detectors::AudioPlayingDetector> (
+            this->m_context, *this->m_fullScreenDetector);
     }
 
     // initialize sdl audio driver
-    m_audioDriver = std::make_unique <WallpaperEngine::Audio::Drivers::SDLAudioDriver> (this->m_context, *this->m_audioDetector, *this->m_audioRecorder);
+    m_audioDriver = std::make_unique<WallpaperEngine::Audio::Drivers::SDLAudioDriver> (
+        this->m_context, *this->m_audioDetector, *this->m_audioRecorder);
     // initialize audio context
-    m_audioContext = std::make_unique <WallpaperEngine::Audio::AudioContext> (*m_audioDriver);
+    m_audioContext = std::make_unique<WallpaperEngine::Audio::AudioContext> (*m_audioDriver);
 }
 
 void WallpaperApplication::prepareOutputs () {
     // initialize render context
-    m_renderContext = std::make_unique <WallpaperEngine::Render::RenderContext> (*m_videoDriver, *this);
+    m_renderContext = std::make_unique<WallpaperEngine::Render::RenderContext> (*m_videoDriver, *this);
     // create a new background for each screen
 
     // set all the specific wallpapers required
     for (const auto& [background, info] : this->m_backgrounds) {
         const auto scalingIt = this->m_context.settings.general.screenScalings.find (background);
         const auto clampIt = this->m_context.settings.general.screenClamps.find (background);
+        const auto uvOffsetIt = this->m_context.settings.general.uvOffset.find (background);
         const auto scaling = scalingIt != this->m_context.settings.general.screenScalings.end ()
                                  ? scalingIt->second
                                  : this->m_context.settings.render.window.scalingMode;
         const auto clamp = clampIt != this->m_context.settings.general.screenClamps.end ()
                                ? clampIt->second
                                : this->m_context.settings.render.window.clamp;
+        const auto uvOffset = uvOffsetIt != this->m_context.settings.general.uvOffset.end ()
+                                  ? uvOffsetIt->second
+                                  : this->m_context.settings.render.window.uvOffset;
 
-        m_renderContext->setWallpaper (
-            background,
-            WallpaperEngine::Render::CWallpaper::fromWallpaper (
-                *info->wallpaper, *m_renderContext, *m_audioContext, m_browserContext.get (),
-                scaling,
-                clamp
-            )
-        );
+        m_renderContext->setWallpaper (background, WallpaperEngine::Render::CWallpaper::fromWallpaper (
+                                                       *info->wallpaper, *m_renderContext, *m_audioContext,
+                                                       m_browserContext.get (), scaling, clamp, uvOffset));
     }
 }
 
 void WallpaperApplication::setupOpenGLDebugging () {
 #if !NDEBUG
-    glDebugMessageCallback(CustomGLDebugCallback, nullptr);
-    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+    glDebugMessageCallback (CustomGLDebugCallback, nullptr);
+    glEnable (GL_DEBUG_OUTPUT_SYNCHRONOUS);
 #endif
 }
-
 
 void WallpaperApplication::show () {
     this->setupOutput ();
@@ -717,7 +626,7 @@ void WallpaperApplication::show () {
 
     int width = this->m_renderContext->getWallpapers ().begin ()->second->getWidth ();
     int height = this->m_renderContext->getWallpapers ().begin ()->second->getHeight ();
-    std::vector<uint8_t> pixels(width * height * 3);
+    std::vector<uint8_t> pixels (width * height * 3);
     bool initialized = false;
     int frame = 0;
 #endif /* DEMOMODE */
@@ -739,7 +648,7 @@ void WallpaperApplication::show () {
         // process driver events
         m_videoDriver->dispatchEventQueue ();
 
-        if (m_videoDriver->closeRequested()) {
+        if (m_videoDriver->closeRequested ()) {
             sLog.out ("Stop requested by driver");
             this->m_context.state.general.keepRunning = false;
         }
@@ -752,17 +661,18 @@ void WallpaperApplication::show () {
             if (!initialized) {
                 width = this->m_renderContext->getWallpapers ().begin ()->second->getWidth ();
                 height = this->m_renderContext->getWallpapers ().begin ()->second->getHeight ();
-                pixels.reserve(width * height * 3);
+                pixels.reserve (width * height * 3);
                 init_encoder ("output.webm", width, height);
                 initialized = true;
             }
 
-            glBindFramebuffer (GL_FRAMEBUFFER, this->m_renderContext->getWallpapers ().begin ()->second->getWallpaperFramebuffer());
+            glBindFramebuffer (GL_FRAMEBUFFER,
+                               this->m_renderContext->getWallpapers ().begin ()->second->getWallpaperFramebuffer ());
 
             glPixelStorei (GL_PACK_ALIGNMENT, 1);
             glReadPixels (0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixels.data ());
             write_video_frame (pixels.data ());
-            frame ++;
+            frame++;
 
             // stop after the given framecount
             if (frame >= FRAME_COUNT) {
@@ -796,7 +706,8 @@ void WallpaperApplication::show () {
 
         this->updatePlaylists ();
 
-        if (!this->m_context.settings.screenshot.take || m_videoDriver->getFrameCounter () < this->m_context.settings.screenshot.delay)
+        if (!this->m_context.settings.screenshot.take ||
+            m_videoDriver->getFrameCounter () < this->m_context.settings.screenshot.delay)
             continue;
 
         this->takeScreenshot (this->m_context.settings.screenshot.path);

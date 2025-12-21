@@ -7,17 +7,15 @@
 namespace WallpaperEngine::Render {
 class Camera;
 class CObject;
-}
+} // namespace WallpaperEngine::Render
 
 namespace WallpaperEngine::Render::Wallpapers {
 using namespace WallpaperEngine::Data::Model;
 
 class CScene final : public CWallpaper {
   public:
-    CScene (
-        const Wallpaper& wallpaper, RenderContext& context, AudioContext& audioContext,
-        const WallpaperState::TextureUVsScaling& scalingMode,
-        const uint32_t& clampMode);
+    CScene (const Wallpaper& wallpaper, RenderContext& context, AudioContext& audioContext,
+            const WallpaperState::TextureUVsScaling& scalingMode, const uint32_t& clampMode, const glm::vec2& uvOffset);
 
     [[nodiscard]] Camera& getCamera () const;
 
@@ -55,4 +53,4 @@ class CScene final : public CWallpaper {
     std::shared_ptr<const CFBO> _rt_Bloom = nullptr;
     std::shared_ptr<const CFBO> _rt_shadowAtlas = nullptr;
 };
-} // namespace WallpaperEngine::Render::Wallpaper
+} // namespace WallpaperEngine::Render::Wallpapers

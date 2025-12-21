@@ -4,24 +4,22 @@
 #include "WallpaperEngine/Render/Wallpapers/CVideo.h"
 #include "WallpaperEngine/Render/Wallpapers/CWeb.h"
 
-#include "WallpaperEngine/Data/Model/Wallpaper.h"
 #include "WallpaperEngine/Data/Model/Project.h"
+#include "WallpaperEngine/Data/Model/Wallpaper.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 using namespace WallpaperEngine::Render;
 
-CWallpaper::CWallpaper (
-    const Wallpaper& wallpaperData, RenderContext& context,AudioContext& audioContext,
-    const WallpaperState::TextureUVsScaling& scalingMode,
-    const uint32_t& clampMode
-) :
+CWallpaper::CWallpaper (const Wallpaper& wallpaperData, RenderContext& context, AudioContext& audioContext,
+                        const WallpaperState::TextureUVsScaling& scalingMode, const uint32_t& clampMode,
+                        const glm::vec2& uvOffset) :
     ContextAware (context),
     FBOProvider (nullptr),
     m_wallpaperData (wallpaperData),
     m_audioContext (audioContext),
-    m_state (scalingMode, clampMode) {
+    m_state (scalingMode, clampMode, uvOffset) {
     // generate the VAO to stop opengl from complaining
     glGenVertexArrays (1, &this->m_vaoBuffer);
     glBindVertexArray (this->m_vaoBuffer);
@@ -248,9 +246,8 @@ void CWallpaper::setupFramebuffers () {
     const uint32_t clamp = this->m_state.getClampingMode ();
 
     // create framebuffer for the scene
-    this->m_sceneFBO = this->create (
-        "_rt_FullFrameBuffer", TextureFormat_ARGB8888, clamp, 1.0, {width,
-        height}, {width, height});
+    this->m_sceneFBO =
+        this->create ("_rt_FullFrameBuffer", TextureFormat_ARGB8888, clamp, 1.0, {width, height}, {width, height});
 
     this->alias ("_rt_MipMappedFrameBuffer", "_rt_FullFrameBuffer");
 }
@@ -276,24 +273,24 @@ std::shared_ptr<const CFBO> CWallpaper::getFBO () const {
     return this->m_sceneFBO;
 }
 
-std::unique_ptr<CWallpaper> CWallpaper::fromWallpaper (
-    const Wallpaper& wallpaper, RenderContext& context, AudioContext& audioContext,
-    WebBrowser::WebBrowserContext* browserContext, const WallpaperState::TextureUVsScaling& scalingMode,
-    const uint32_t& clampMode
-) {
+std::unique_ptr<CWallpaper> CWallpaper::fromWallpaper (const Wallpaper& wallpaper, RenderContext& context,
+                                                       AudioContext& audioContext,
+                                                       WebBrowser::WebBrowserContext* browserContext,
+                                                       const WallpaperState::TextureUVsScaling& scalingMode,
+                                                       const uint32_t& clampMode, const glm::vec2& uvOffset) {
     if (wallpaper.is<Scene> ()) {
-        return std::make_unique <WallpaperEngine::Render::Wallpapers::CScene> (
-            wallpaper, context, audioContext, scalingMode, clampMode);
+        return std::make_unique<WallpaperEngine::Render::Wallpapers::CScene> (wallpaper, context, audioContext,
+                                                                              scalingMode, clampMode, uvOffset);
     }
 
     if (wallpaper.is<Video> ()) {
-        return std::make_unique<WallpaperEngine::Render::Wallpapers::CVideo> (
-            wallpaper, context, audioContext, scalingMode, clampMode);
+        return std::make_unique<WallpaperEngine::Render::Wallpapers::CVideo> (wallpaper, context, audioContext,
+                                                                              scalingMode, clampMode, uvOffset);
     }
 
     if (wallpaper.is<Web> ()) {
         return std::make_unique<WallpaperEngine::Render::Wallpapers::CWeb> (
-            wallpaper, context, audioContext, *browserContext, scalingMode, clampMode);
+            wallpaper, context, audioContext, *browserContext, scalingMode, clampMode, uvOffset);
     }
 
     sLog.exception ("Unsupported wallpaper type");

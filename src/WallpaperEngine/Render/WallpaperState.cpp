@@ -2,17 +2,18 @@
 #include "TextureProvider.h"
 #include "WallpaperEngine/Logging/Log.h"
 #include <algorithm>
+#include <glm/ext/vector_float2.hpp>
 
 using namespace WallpaperEngine::Render;
 
-WallpaperState::WallpaperState (
-    const TextureUVsScaling& textureUVsMode, const uint32_t& clampMode) :
+WallpaperState::WallpaperState (const TextureUVsScaling& textureUVsMode, const uint32_t& clampMode,
+                                const glm::vec2& uvOffsets) :
     m_textureUVsMode (textureUVsMode),
-    m_clampingMode (clampMode) {}
+    m_clampingMode (clampMode),
+    m_uvOffsets (uvOffsets) {}
 
-bool WallpaperState::hasChanged (
-    const glm::ivec4& viewport, const bool& vflip, const int& projectionWidth,const int& projectionHeight
-) const {
+bool WallpaperState::hasChanged (const glm::ivec4& viewport, const bool& vflip, const int& projectionWidth,
+                                 const int& projectionHeight) const {
     return this->m_viewport.width != viewport.z || this->m_viewport.height != viewport.w ||
            this->m_projection.width != projectionWidth || this->m_projection.height != projectionHeight ||
            this->m_vflip != vflip;
@@ -30,6 +31,8 @@ void WallpaperState::resetUVs () {
         this->m_UVs.vstart = 1.0f;
         this->m_UVs.vend = 0.0f;
     }
+
+    this->addUVOffsets ();
 }
 
 // Update Us coordinates for current viewport and projection
@@ -45,6 +48,8 @@ void WallpaperState::updateUs (const int& projectionWidth, const int& projection
 
     this->m_UVs.ustart = left / newWidth;
     this->m_UVs.uend = right / newWidth;
+
+    this->addUVOffsets ();
 }
 
 // Update Vs coordinates for current viewport and projection
@@ -64,6 +69,21 @@ void WallpaperState::updateVs (const int& projectionWidth, const int& projection
     } else {
         this->m_UVs.vstart = up / newHeight;
         this->m_UVs.vend = down / newHeight;
+    }
+
+    this->addUVOffsets ();
+}
+
+void WallpaperState::addUVOffsets () {
+    this->m_UVs.ustart += this->getViewportHorizontalOffset ();
+    this->m_UVs.uend += this->getViewportHorizontalOffset ();
+
+    if (m_vflip) {
+        this->m_UVs.vstart -= this->getViewportVerticalOffset ();
+        this->m_UVs.vend -= this->getViewportVerticalOffset ();
+    } else {
+        this->m_UVs.vstart += this->getViewportVerticalOffset ();
+        this->m_UVs.vend += this->getViewportVerticalOffset ();
     }
 }
 
@@ -166,8 +186,16 @@ int WallpaperState::getProjectionHeight () const {
     return this->m_projection.height;
 }
 
+float WallpaperState::getViewportHorizontalOffset () const {
+    return this->m_uvOffsets.x;
+}
+
+float WallpaperState::getViewportVerticalOffset () const {
+    return this->m_uvOffsets.y;
+}
+
 void WallpaperState::updateState (const glm::ivec4& viewport, const bool& vflip, const int& projectionWidth,
-                                   const int& projectionHeight) {
+                                  const int& projectionHeight) {
     this->m_viewport.width = viewport.z;
     this->m_viewport.height = viewport.w;
     this->m_vflip = vflip;

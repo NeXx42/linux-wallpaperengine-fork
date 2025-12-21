@@ -2,12 +2,14 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <glm/vec2.hpp>
 #include <glm/vec4.hpp>
 
 #include "TextureProvider.h"
 
 namespace WallpaperEngine::Render {
 using namespace WallpaperEngine::Data::Assets;
+
 /**
  * Represents current wallpaper state
  */
@@ -21,8 +23,7 @@ class WallpaperState {
         StretchUVs,
     };
 
-    WallpaperState (
-        const TextureUVsScaling& textureUVsMode, const uint32_t& clampMode);
+    WallpaperState (const TextureUVsScaling& textureUVsMode, const uint32_t& clampMode, const glm::vec2& uvOffsets);
 
     /**
      * Checks if any of the given values has changed
@@ -32,8 +33,8 @@ class WallpaperState {
      * @param projectionHeight
      * @return
      */
-    [[nodiscard]] bool hasChanged (
-        const glm::ivec4& viewport, const bool& vflip, const int& projectionWidth, const int& projectionHeight) const;
+    [[nodiscard]] bool hasChanged (const glm::ivec4& viewport, const bool& vflip, const int& projectionWidth,
+                                   const int& projectionHeight) const;
 
     /**
      * Resets UVs to 0/1 values.
@@ -55,6 +56,11 @@ class WallpaperState {
      * @param projectionHeight
      */
     void updateVs (const int& projectionWidth, const int& projectionHeight);
+
+    /**
+     * Offsets UVs.
+     */
+    void addUVOffsets ();
 
     /**
      * @return Texture UV coordinates for current viewport and projection
@@ -109,6 +115,16 @@ class WallpaperState {
      */
     [[nodiscard]] int getProjectionHeight () const;
 
+    /**
+     * @return The horizontal UV offset
+     */
+    [[nodiscard]] float getViewportHorizontalOffset () const;
+
+    /**
+     * @return The vertical UV offset
+     */
+    [[nodiscard]] float getViewportVerticalOffset () const;
+
   private:
     // Cached UVs value for texture coordinates. No need to recalculate if viewport and projection haven't changed.
     struct {
@@ -136,5 +152,8 @@ class WallpaperState {
     // Texture scaling mode
     TextureUVsScaling m_textureUVsMode = TextureUVsScaling::DefaultUVs;
     uint32_t m_clampingMode = TextureFlags_NoFlags;
+
+    // offsets
+    glm::vec2 m_uvOffsets;
 };
 } // namespace WallpaperEngine::Render
