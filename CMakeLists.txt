@@ -260,6 +260,10 @@ include_directories(
     ${CMAKE_SOURCE_DIR}
     ${X11_INCLUDES})
 
+set(SHADER_FILES
+    "src/shaders/postprocess.vert"
+    "src/shaders/postprocess.frag")
+    
 set(COMMON_SOURCES
     src/External/MimeTypes/MimeTypes.cpp
     src/External/MimeTypes/MimeTypes.h
@@ -558,6 +562,7 @@ endif()
 
 COPY_FILES(linux-wallpaperengine "${CEF_BINARY_FILES}" "${CEF_BINARY_DIR}" "${TARGET_OUTPUT_DIRECTORY}")
 COPY_FILES(linux-wallpaperengine "${CEF_RESOURCE_FILES}" "${CEF_RESOURCE_DIR}" "${TARGET_OUTPUT_DIRECTORY}")
+COPY_FILES(linux-wallpaperengine "${SHADER_FILES}" "${CMAKE_SOURCE_DIR}" "${TARGET_OUTPUT_DIRECTORY}/shaders")
 # remove the vulkan lib as chromium includes a broken libvulkan.so.1 with it
 file(REMOVE "${CEF_BINARY_DIR}/libvulkan.so.1")
 

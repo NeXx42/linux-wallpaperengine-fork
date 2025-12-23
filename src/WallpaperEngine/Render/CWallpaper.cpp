@@ -10,6 +10,12 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <string>
+
 using namespace WallpaperEngine::Render;
 
 CWallpaper::CWallpaper (const Wallpaper& wallpaperData, RenderContext& context, AudioContext& audioContext,
@@ -59,22 +65,28 @@ GLuint CWallpaper::getWallpaperTexture () const {
     return this->m_sceneFBO->getTextureID (0);
 }
 
+std::string CWallpaper::loadShaderFile (const std::string& path) {
+    std::filesystem::path executingPath = std::filesystem::read_symlink ("/proc/self/exe").parent_path ();
+    std::ifstream file (executingPath / path);
+
+    if (!file.is_open ()) {
+        std::cerr << "Failed to open shader file: " << (executingPath / path) << std::endl;
+        return "";
+    }
+
+    std::stringstream buffer;
+    buffer << file.rdbuf ();
+    return buffer.str ();
+}
+
 void CWallpaper::setupShaders () {
     // reserve shaders in OpenGL
     const GLuint vertexShaderID = glCreateShader (GL_VERTEX_SHADER);
 
-    // give shader's source code to OpenGL to be compiled
-    const char* sourcePointer = "#version 330\n"
-                                "precision highp float;\n"
-                                "in vec3 a_Position;\n"
-                                "in vec2 a_TexCoord;\n"
-                                "out vec2 v_TexCoord;\n"
-                                "void main () {\n"
-                                "gl_Position = vec4 (a_Position, 1.0);\n"
-                                "v_TexCoord = a_TexCoord;\n"
-                                "}";
+    std::string vertSrc = this->loadShaderFile ("shaders/postprocess.vert");
+    const char* vSrc = vertSrc.c_str ();
 
-    glShaderSource (vertexShaderID, 1, &sourcePointer, nullptr);
+    glShaderSource (vertexShaderID, 1, &vSrc, nullptr);
     glCompileShader (vertexShaderID);
 
     GLint result = GL_FALSE;
@@ -101,17 +113,10 @@ void CWallpaper::setupShaders () {
     // reserve shaders in OpenGL
     const GLuint fragmentShaderID = glCreateShader (GL_FRAGMENT_SHADER);
 
-    // give shader's source code to OpenGL to be compiled
-    sourcePointer = "#version 330\n"
-                    "precision highp float;\n"
-                    "uniform sampler2D g_Texture0;\n"
-                    "in vec2 v_TexCoord;\n"
-                    "out vec4 out_FragColor;\n"
-                    "void main () {\n"
-                    "out_FragColor = texture (g_Texture0, v_TexCoord);\n"
-                    "}";
+    std::string fragSrc = this->loadShaderFile ("shaders/postprocess.frag");
+    const char* fSrc = fragSrc.c_str ();
 
-    glShaderSource (fragmentShaderID, 1, &sourcePointer, nullptr);
+    glShaderSource (fragmentShaderID, 1, &fSrc, nullptr);
     glCompileShader (fragmentShaderID);
 
     result = GL_FALSE;

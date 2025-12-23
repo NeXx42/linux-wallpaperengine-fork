@@ -184,5 +184,7 @@ class CWallpaper : public Helpers::ContextAware, public FBOProvider {
     AudioContext& m_audioContext;
     /** Current Wallpaper state */
     WallpaperState m_state;
+
+    std::string loadShaderFile (const std::string& path);
 };
 } // namespace WallpaperEngine::Render
