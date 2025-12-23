@@ -14,8 +14,9 @@ using namespace WallpaperEngine::Data::Model;
 
 class CScene final : public CWallpaper {
   public:
-    CScene (const Wallpaper& wallpaper, RenderContext& context, AudioContext& audioContext,
-            const WallpaperState::TextureUVsScaling& scalingMode, const uint32_t& clampMode, const glm::vec2& uvOffset);
+    CScene (const Wallpaper& wallpaper, RenderContext& context, const ShaderSettings& shaderSettings,
+            AudioContext& audioContext, const WallpaperState::TextureUVsScaling& scalingMode, const uint32_t& clampMode,
+            const glm::vec2& uvOffset);
 
     [[nodiscard]] Camera& getCamera () const;
 

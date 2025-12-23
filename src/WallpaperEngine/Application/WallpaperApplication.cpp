@@ -368,10 +368,11 @@ void WallpaperApplication::advancePlaylist (const std::string& screen, ActivePla
                                    : this->m_context.settings.render.window.uvOffset;
 
         if (this->m_renderContext) {
-            this->m_renderContext->setWallpaper (screen, WallpaperEngine::Render::CWallpaper::fromWallpaper (
-                                                             *this->m_backgrounds [screen]->wallpaper,
-                                                             *this->m_renderContext, *this->m_audioContext,
-                                                             this->m_browserContext.get (), scaling, clamp, uvOffsets));
+            this->m_renderContext->setWallpaper (screen,
+                                                 WallpaperEngine::Render::CWallpaper::fromWallpaper (
+                                                     *this->m_backgrounds [screen]->wallpaper, *this->m_renderContext,
+                                                     this->m_context.settings.render.shader, *this->m_audioContext,
+                                                     this->m_browserContext.get (), scaling, clamp, uvOffsets));
         }
 
         this->m_context.settings.general.screenBackgrounds [screen] = nextPath;
@@ -586,9 +587,10 @@ void WallpaperApplication::prepareOutputs () {
                                   ? uvOffsetIt->second
                                   : this->m_context.settings.render.window.uvOffset;
 
-        m_renderContext->setWallpaper (background, WallpaperEngine::Render::CWallpaper::fromWallpaper (
-                                                       *info->wallpaper, *m_renderContext, *m_audioContext,
-                                                       m_browserContext.get (), scaling, clamp, uvOffset));
+        m_renderContext->setWallpaper (background,
+                                       WallpaperEngine::Render::CWallpaper::fromWallpaper (
+                                           *info->wallpaper, *m_renderContext, this->m_context.settings.render.shader,
+                                           *m_audioContext, m_browserContext.get (), scaling, clamp, uvOffset));
     }
 }
 

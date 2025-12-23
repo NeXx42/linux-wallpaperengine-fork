@@ -492,6 +492,14 @@ void ApplicationContext::loadSettingsFromArgv () {
         .help ("Disables parallax effect for the backgrounds")
         .flag ()
         .action ([this] (const std::string& value) -> void { this->settings.mouse.disableparallax = true; });
+    configurationGroup.add_argument ("--contrast")
+        .help ("Contrast of the backgrounds")
+        .default_value<float> (1.0)
+        .store_into (this->settings.render.shader.contrast);
+    configurationGroup.add_argument ("--saturation")
+        .help ("Saturation of the backgrounds")
+        .default_value<float> (1.0)
+        .store_into (this->settings.render.shader.saturation);
 
     configurationGroup.add_argument ("-l", "--list-properties")
         .help ("List all the available properties and their configuration")

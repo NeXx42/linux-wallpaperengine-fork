@@ -14,10 +14,10 @@ void* get_proc_address (void* ctx, const char* name) {
     return static_cast<CVideo*> (ctx)->getContext ().getDriver ().getProcAddress (name);
 }
 
-CVideo::CVideo (const Wallpaper& wallpaper, RenderContext& context, AudioContext& audioContext,
-                const WallpaperState::TextureUVsScaling& scalingMode, const uint32_t& clampMode,
-                const glm::vec2& uvOffset) :
-    CWallpaper (wallpaper, context, audioContext, scalingMode, clampMode, uvOffset) {
+CVideo::CVideo (const Wallpaper& wallpaper, RenderContext& context, const ShaderSettings& shaderSettings,
+                AudioContext& audioContext, const WallpaperState::TextureUVsScaling& scalingMode,
+                const uint32_t& clampMode, const glm::vec2& uvOffset) :
+    CWallpaper (wallpaper, context, shaderSettings, audioContext, scalingMode, clampMode, uvOffset) {
     double volume = this->getContext ().getApp ().getContext ().settings.audio.volume * 100.0 / 128.0;
 
     // create mpv contexts

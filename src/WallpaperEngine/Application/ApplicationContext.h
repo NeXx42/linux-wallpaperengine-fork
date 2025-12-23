@@ -16,6 +16,7 @@
 #include "WallpaperEngine/Render/WallpaperState.h"
 
 #include "WallpaperEngine/Data/Model/Project.h"
+#include "WallpaperEngine/Data/Model/Shader.h"
 
 namespace WallpaperEngine::Application {
 using namespace WallpaperEngine::Data::Assets;
@@ -106,6 +107,8 @@ class ApplicationContext {
              * Example: "firefox" will match "org.mozilla.firefox".
              */
             std::vector<std::string> fullscreenPauseIgnoreAppIds;
+
+            WallpaperEngine::Data::Model::ShaderSettings shader;
 
             struct {
                 /** The window size used in explicit window */

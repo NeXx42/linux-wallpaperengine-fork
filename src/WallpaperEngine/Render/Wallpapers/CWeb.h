@@ -24,8 +24,8 @@ class RenderHandler;
 namespace WallpaperEngine::Render::Wallpapers {
 class CWeb : public CWallpaper {
   public:
-    CWeb (const Wallpaper& wallpaper, RenderContext& context, AudioContext& audioContext,
-          WallpaperEngine::WebBrowser::WebBrowserContext& browserContext,
+    CWeb (const Wallpaper& wallpaper, RenderContext& context, const ShaderSettings& shaderSettings,
+          AudioContext& audioContext, WallpaperEngine::WebBrowser::WebBrowserContext& browserContext,
           const WallpaperState::TextureUVsScaling& scalingMode, const uint32_t& clampMode, const glm::vec2& uvOffset);
     ~CWeb () override;
 

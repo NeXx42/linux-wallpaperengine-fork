@@ -5,6 +5,7 @@
 #include "WallpaperEngine/Render/Wallpapers/CWeb.h"
 
 #include "WallpaperEngine/Data/Model/Project.h"
+#include "WallpaperEngine/Data/Model/Shader.h"
 #include "WallpaperEngine/Data/Model/Wallpaper.h"
 
 #include <glm/glm.hpp>
@@ -18,12 +19,13 @@
 
 using namespace WallpaperEngine::Render;
 
-CWallpaper::CWallpaper (const Wallpaper& wallpaperData, RenderContext& context, AudioContext& audioContext,
-                        const WallpaperState::TextureUVsScaling& scalingMode, const uint32_t& clampMode,
-                        const glm::vec2& uvOffset) :
+CWallpaper::CWallpaper (const Wallpaper& wallpaperData, RenderContext& context, const ShaderSettings& shaderSettings,
+                        AudioContext& audioContext, const WallpaperState::TextureUVsScaling& scalingMode,
+                        const uint32_t& clampMode, const glm::vec2& uvOffset) :
     ContextAware (context),
     FBOProvider (nullptr),
     m_wallpaperData (wallpaperData),
+    m_shaderSettings (shaderSettings),
     m_audioContext (audioContext),
     m_state (scalingMode, clampMode, uvOffset) {
     // generate the VAO to stop opengl from complaining
@@ -178,6 +180,15 @@ void CWallpaper::setupShaders () {
     this->g_Texture0 = glGetUniformLocation (this->m_shader, "g_Texture0");
     this->a_Position = glGetAttribLocation (this->m_shader, "a_Position");
     this->a_TexCoord = glGetAttribLocation (this->m_shader, "a_TexCoord");
+
+    // set shader properties
+    auto u_Saturation = glGetUniformLocation (this->m_shader, "u_Saturation");
+    auto u_Contrast = glGetUniformLocation (this->m_shader, "u_Contrast");
+
+    glUseProgram (this->m_shader);
+
+    glUniform1f (u_Saturation, this->m_shaderSettings.saturation);
+    glUniform1f (u_Contrast, this->m_shaderSettings.contrast);
 }
 
 void CWallpaper::setDestinationFramebuffer (GLuint framebuffer) {
@@ -279,23 +290,23 @@ std::shared_ptr<const CFBO> CWallpaper::getFBO () const {
 }
 
 std::unique_ptr<CWallpaper> CWallpaper::fromWallpaper (const Wallpaper& wallpaper, RenderContext& context,
-                                                       AudioContext& audioContext,
+                                                       const ShaderSettings& shaderSettings, AudioContext& audioContext,
                                                        WebBrowser::WebBrowserContext* browserContext,
                                                        const WallpaperState::TextureUVsScaling& scalingMode,
                                                        const uint32_t& clampMode, const glm::vec2& uvOffset) {
     if (wallpaper.is<Scene> ()) {
-        return std::make_unique<WallpaperEngine::Render::Wallpapers::CScene> (wallpaper, context, audioContext,
-                                                                              scalingMode, clampMode, uvOffset);
+        return std::make_unique<WallpaperEngine::Render::Wallpapers::CScene> (
+            wallpaper, context, shaderSettings, audioContext, scalingMode, clampMode, uvOffset);
     }
 
     if (wallpaper.is<Video> ()) {
-        return std::make_unique<WallpaperEngine::Render::Wallpapers::CVideo> (wallpaper, context, audioContext,
-                                                                              scalingMode, clampMode, uvOffset);
+        return std::make_unique<WallpaperEngine::Render::Wallpapers::CVideo> (
+            wallpaper, context, shaderSettings, audioContext, scalingMode, clampMode, uvOffset);
     }
 
     if (wallpaper.is<Web> ()) {
         return std::make_unique<WallpaperEngine::Render::Wallpapers::CWeb> (
-            wallpaper, context, audioContext, *browserContext, scalingMode, clampMode, uvOffset);
+            wallpaper, context, shaderSettings, audioContext, *browserContext, scalingMode, clampMode, uvOffset);
     }
 
     sLog.exception ("Unsupported wallpaper type");

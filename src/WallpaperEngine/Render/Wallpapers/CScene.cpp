@@ -7,7 +7,9 @@
 #include "CScene.h"
 #include "WallpaperEngine/Logging/Log.h"
 
+#include "WallpaperEngine/Data/Model/Shader.h"
 #include "WallpaperEngine/Data/Model/Wallpaper.h"
+
 #include "WallpaperEngine/Data/Parsers/ObjectParser.h"
 
 extern float g_Time;
@@ -20,10 +22,10 @@ using namespace WallpaperEngine::Data::Parsers;
 using namespace WallpaperEngine::Render::Wallpapers;
 using JSON = WallpaperEngine::Data::JSON::JSON;
 
-CScene::CScene (const Wallpaper& wallpaper, RenderContext& context, AudioContext& audioContext,
-                const WallpaperState::TextureUVsScaling& scalingMode, const uint32_t& clampMode,
-                const glm::vec2& uvOffset) :
-    CWallpaper (wallpaper, context, audioContext, scalingMode, clampMode, uvOffset) {
+CScene::CScene (const Wallpaper& wallpaper, RenderContext& context, const ShaderSettings& shaderSettings,
+                AudioContext& audioContext, const WallpaperState::TextureUVsScaling& scalingMode,
+                const uint32_t& clampMode, const glm::vec2& uvOffset) :
+    CWallpaper (wallpaper, context, shaderSettings, audioContext, scalingMode, clampMode, uvOffset) {
     // caller should check this, if not a std::bad_cast is good to throw
     auto scene = wallpaper.as<Scene> ();
 

@@ -13,10 +13,11 @@ using namespace WallpaperEngine::Render::Wallpapers;
 using namespace WallpaperEngine::WebBrowser;
 using namespace WallpaperEngine::WebBrowser::CEF;
 
-CWeb::CWeb (const Wallpaper& wallpaper, RenderContext& context, AudioContext& audioContext,
-            WebBrowserContext& browserContext, const WallpaperState::TextureUVsScaling& scalingMode,
-            const uint32_t& clampMode, const glm::vec2& uvOffset) :
-    CWallpaper (wallpaper, context, audioContext, scalingMode, clampMode, uvOffset),
+CWeb::CWeb (const Wallpaper& wallpaper, RenderContext& context, const ShaderSettings& shaderSettings,
+            AudioContext& audioContext, WebBrowserContext& browserContext,
+            const WallpaperState::TextureUVsScaling& scalingMode, const uint32_t& clampMode,
+            const glm::vec2& uvOffset) :
+    CWallpaper (wallpaper, context, shaderSettings, audioContext, scalingMode, clampMode, uvOffset),
     m_browserContext (browserContext) {
     // setup framebuffers
     this->setupFramebuffers ();

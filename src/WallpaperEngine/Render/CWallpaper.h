@@ -3,12 +3,14 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include "WallpaperEngine/Application/ApplicationContext.h"
 #include "WallpaperEngine/Audio/AudioContext.h"
 
 #include "WallpaperEngine/Render/CFBO.h"
 #include "WallpaperEngine/Render/Helpers/ContextAware.h"
 #include "WallpaperEngine/Render/RenderContext.h"
 
+#include "WallpaperEngine/Data/Model/Shader.h"
 #include "WallpaperEngine/Data/Model/Wallpaper.h"
 
 #include "FBOProvider.h"
@@ -137,15 +139,15 @@ class CWallpaper : public Helpers::ContextAware, public FBOProvider {
      * @return
      */
     static std::unique_ptr<CWallpaper> fromWallpaper (const Wallpaper& wallpaper, RenderContext& context,
-                                                      AudioContext& audioContext,
+                                                      const ShaderSettings& shaderSettings, AudioContext& audioContext,
                                                       WebBrowser::WebBrowserContext* browserContext,
                                                       const WallpaperState::TextureUVsScaling& scalingMode,
                                                       const uint32_t& clampMode, const glm::vec2& uvOffset);
 
   protected:
-    CWallpaper (const Wallpaper& wallpaperData, RenderContext& context, AudioContext& audioContext,
-                const WallpaperState::TextureUVsScaling& scalingMode, const uint32_t& clampMode,
-                const glm::vec2& uvOffset);
+    CWallpaper (const Wallpaper& wallpaperData, RenderContext& context, const ShaderSettings& shaderSettings,
+                AudioContext& audioContext, const WallpaperState::TextureUVsScaling& scalingMode,
+                const uint32_t& clampMode, const glm::vec2& uvOffset);
 
     /**
      * Renders a frame of the wallpaper
@@ -158,6 +160,7 @@ class CWallpaper : public Helpers::ContextAware, public FBOProvider {
     void setupFramebuffers ();
 
     const Wallpaper& m_wallpaperData;
+    const ShaderSettings m_shaderSettings;
 
     [[nodiscard]] const Wallpaper& getWallpaperData () const;
 
@@ -177,6 +180,7 @@ class CWallpaper : public Helpers::ContextAware, public FBOProvider {
     /** The framebuffer to draw the background to */
     GLuint m_destFramebuffer = GL_NONE;
     /** Setups OpenGL's shaders for this wallpaper backbuffer */
+    std::string loadShaderFile (const std::string& path);
     void setupShaders ();
     /** List of FBOs registered for this wallpaper */
     std::map<std::string, std::shared_ptr<const CFBO>> m_fbos = {};
@@ -184,7 +188,5 @@ class CWallpaper : public Helpers::ContextAware, public FBOProvider {
     AudioContext& m_audioContext;
     /** Current Wallpaper state */
     WallpaperState m_state;
-
-    std::string loadShaderFile (const std::string& path);
 };
 } // namespace WallpaperEngine::Render
