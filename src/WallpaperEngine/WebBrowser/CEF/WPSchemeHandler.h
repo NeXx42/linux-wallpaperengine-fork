@@ -21,19 +21,16 @@ using namespace WallpaperEngine::Data::Model;
  */
 class WPSchemeHandler : public CefResourceHandler {
   public:
-    explicit WPSchemeHandler(const Project& project);
+    explicit WPSchemeHandler (const Project& project);
 
-    bool Open(CefRefPtr<CefRequest> request,
-               bool& handle_request,
-               CefRefPtr<CefCallback> callback) override;
+    bool Open (CefRefPtr<CefRequest> request, bool& handle_request, CefRefPtr<CefCallback> callback) override;
 
-    void GetResponseHeaders(CefRefPtr<CefResponse> response,
-                             int64_t& response_length,
+    void GetResponseHeaders (CefRefPtr<CefResponse> response, int64_t& response_length,
                              CefString& redirectUrl) override;
 
-    void Cancel() override;
+    void Cancel () override;
 
-    bool Read(void* data_out, int bytes_to_read, int& bytes_read,
+    bool Read (void* data_out, int bytes_to_read, int& bytes_read,
                CefRefPtr<CefResourceReadCallback> callback) override;
 
   private:
@@ -43,8 +40,7 @@ class WPSchemeHandler : public CefResourceHandler {
     ReadStreamSharedPtr m_contents = nullptr;
     std::string m_mimeType;
 
-
-    IMPLEMENT_REFCOUNTING(WPSchemeHandler);
-    DISALLOW_COPY_AND_ASSIGN(WPSchemeHandler);
+    IMPLEMENT_REFCOUNTING (WPSchemeHandler);
+    DISALLOW_COPY_AND_ASSIGN (WPSchemeHandler);
 };
-};
+}; // namespace WallpaperEngine::WebBrowser::CEF

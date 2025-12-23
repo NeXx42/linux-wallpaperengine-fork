@@ -3,8 +3,8 @@
 
 using namespace WallpaperEngine::Render;
 
-CFBO::CFBO (std::string name, const TextureFormat format, const uint32_t flags, const float scale,
-            uint32_t realWidth, uint32_t realHeight, uint32_t textureWidth, uint32_t textureHeight) :
+CFBO::CFBO (std::string name, const TextureFormat format, const uint32_t flags, const float scale, uint32_t realWidth,
+            uint32_t realHeight, uint32_t textureWidth, uint32_t textureHeight) :
     m_scale (scale),
     m_name (std::move (name)),
     m_format (format),
@@ -138,17 +138,17 @@ bool CFBO::isAnimated () const {
 }
 
 uint32_t CFBO::getSpritesheetCols () const {
-    return 0;  // FBOs don't have spritesheets
+    return 0; // FBOs don't have spritesheets
 }
 
 uint32_t CFBO::getSpritesheetRows () const {
-    return 0;  // FBOs don't have spritesheets
+    return 0; // FBOs don't have spritesheets
 }
 
 uint32_t CFBO::getSpritesheetFrames () const {
-    return 0;  // FBOs don't have spritesheets
+    return 0; // FBOs don't have spritesheets
 }
 
 float CFBO::getSpritesheetDuration () const {
-    return 0.0f;  // FBOs don't have spritesheets
+    return 0.0f; // FBOs don't have spritesheets
 }

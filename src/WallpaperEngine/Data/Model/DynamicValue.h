@@ -33,15 +33,15 @@ class DynamicValue {
     };
 
     DynamicValue () = default;
-    explicit DynamicValue(const glm::ivec4& value);
-    explicit DynamicValue(const glm::ivec3& value);
-    explicit DynamicValue(const glm::ivec2& value);
-    explicit DynamicValue(const glm::vec4& value);
-    explicit DynamicValue(const glm::vec3& value);
-    explicit DynamicValue(const glm::vec2& value);
-    explicit DynamicValue(float value);
-    explicit DynamicValue(int value);
-    explicit DynamicValue(bool value);
+    explicit DynamicValue (const glm::ivec4& value);
+    explicit DynamicValue (const glm::ivec3& value);
+    explicit DynamicValue (const glm::ivec2& value);
+    explicit DynamicValue (const glm::vec4& value);
+    explicit DynamicValue (const glm::vec3& value);
+    explicit DynamicValue (const glm::vec2& value);
+    explicit DynamicValue (float value);
+    explicit DynamicValue (int value);
+    explicit DynamicValue (bool value);
     virtual ~DynamicValue ();
 
     [[nodiscard]] const glm::ivec4& getIVec4 () const;
@@ -127,4 +127,4 @@ class DynamicValue {
     UnderlyingType m_type = Null;
     std::optional<ConditionInfo> m_condition = std::nullopt;
 };
-}
+} // namespace WallpaperEngine::Data::Model

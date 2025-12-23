@@ -17,7 +17,7 @@ class BinaryReader {
     [[nodiscard]] float nextFloat () const;
     [[nodiscard]] std::string nextNullTerminatedString () const;
     [[nodiscard]] std::string nextSizedString () const;
-    void next(char* out, size_t size) const;
+    void next (char* out, size_t size) const;
     [[nodiscard]] char next () const;
 
     [[nodiscard]] std::istream& base () const;
@@ -27,4 +27,4 @@ class BinaryReader {
 };
 
 using BinaryReaderUniquePtr = std::unique_ptr<BinaryReader>;
-}
+} // namespace WallpaperEngine::Data::Utils

@@ -10,10 +10,10 @@
 
 using namespace WallpaperEngine::Render;
 
-CTexture::CTexture (TextureUniquePtr header) : m_header (std::move(header)) {
+CTexture::CTexture (TextureUniquePtr header) : m_header (std::move (header)) {
     // ensure the header is parsed
     this->setupResolution ();
-    const GLint internalFormat = this->setupInternalFormat();
+    const GLint internalFormat = this->setupInternalFormat ();
 
     // allocate texture ids list
     this->m_textureID = new GLuint [this->m_header->imageCount];
@@ -36,13 +36,9 @@ CTexture::CTexture (TextureUniquePtr header) : m_header (std::move(header)) {
             if (this->m_header->freeImageFormat != FIF_UNKNOWN) {
                 int fileChannels;
 
-                dataptr = handle = stbi_load_from_memory (
-                    reinterpret_cast <unsigned char*> (mipmap->uncompressedData.get ()),
-                    mipmap->uncompressedSize,
-                    &width,
-                    &height,
-                    &fileChannels,
-                    4);
+                dataptr = handle =
+                    stbi_load_from_memory (reinterpret_cast<unsigned char*> (mipmap->uncompressedData.get ()),
+                                           mipmap->uncompressedSize, &width, &height, &fileChannels, 4);
             } else {
                 if (this->m_header->format == TextureFormat_R8) {
                     // red textures are 1-byte-per-pixel, so it's alignment has to be set manually
@@ -57,16 +53,14 @@ CTexture::CTexture (TextureUniquePtr header) : m_header (std::move(header)) {
                 case GL_RGBA8:
                 case GL_RG8:
                 case GL_R8:
-                    glTexImage2D (
-                        GL_TEXTURE_2D, level, internalFormat, width, height, 0, textureFormat,
-                        GL_UNSIGNED_BYTE, dataptr);
+                    glTexImage2D (GL_TEXTURE_2D, level, internalFormat, width, height, 0, textureFormat,
+                                  GL_UNSIGNED_BYTE, dataptr);
                     break;
                 case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT:
                 case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT:
                 case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
-                    glCompressedTexImage2D (
-                        GL_TEXTURE_2D, level, internalFormat, width, height, 0, bufferSize,
-                        dataptr);
+                    glCompressedTexImage2D (GL_TEXTURE_2D, level, internalFormat, width, height, 0, bufferSize,
+                                            dataptr);
                     break;
                 default: sLog.exception ("Cannot load texture, unknown format", this->m_header->format);
             }
@@ -76,17 +70,15 @@ CTexture::CTexture (TextureUniquePtr header) : m_header (std::move(header)) {
                 stbi_image_free (handle);
             }
 
-            level ++;
+            level++;
         }
     }
 }
 
 void CTexture::setupResolution () {
     if (this->isAnimated ()) {
-        this->m_resolution = {
-            this->m_header->textureWidth, this->m_header->textureHeight,
-            this->m_header->gifWidth, this->m_header->gifHeight
-        };
+        this->m_resolution = {this->m_header->textureWidth, this->m_header->textureHeight, this->m_header->gifWidth,
+                              this->m_header->gifHeight};
     } else {
         if (this->m_header->freeImageFormat != FIF_UNKNOWN) {
             // wpengine-texture format always has one mipmap
@@ -94,16 +86,11 @@ void CTexture::setupResolution () {
             const auto element = this->m_header->images.find (0)->second.begin ();
 
             // set the texture resolution
-            this->m_resolution = {
-                (*element)->width, (*element)->height,
-                this->m_header->width, this->m_header->height
-            };
+            this->m_resolution = {(*element)->width, (*element)->height, this->m_header->width, this->m_header->height};
         } else {
             // set the texture resolution
-            this->m_resolution = {
-                this->m_header->textureWidth, this->m_header->textureHeight,
-                this->m_header->width, this->m_header->height
-            };
+            this->m_resolution = {this->m_header->textureWidth, this->m_header->textureHeight, this->m_header->width,
+                                  this->m_header->height};
         }
     }
 }
@@ -115,20 +102,13 @@ GLint CTexture::setupInternalFormat () const {
 
     // detect the image format and hand it to openGL to be used
     switch (this->m_header->format) {
-        case TextureFormat_DXT5:
-            return GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
-        case TextureFormat_DXT3:
-            return GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
-        case TextureFormat_DXT1:
-            return GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
-        case TextureFormat_ARGB8888:
-            return GL_RGBA8;
-        case TextureFormat_R8:
-            return GL_R8;
-        case TextureFormat_RG88:
-            return GL_RG8;
-        default:
-            sLog.exception ("Cannot determine texture format");
+        case TextureFormat_DXT5: return GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+        case TextureFormat_DXT3: return GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
+        case TextureFormat_DXT1: return GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
+        case TextureFormat_ARGB8888: return GL_RGBA8;
+        case TextureFormat_R8: return GL_R8;
+        case TextureFormat_RG88: return GL_RG8;
+        default: sLog.exception ("Cannot determine texture format");
     }
 }
 

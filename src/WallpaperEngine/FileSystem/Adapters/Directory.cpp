@@ -10,7 +10,7 @@ using namespace WallpaperEngine::FileSystem;
 using namespace WallpaperEngine::FileSystem::Adapters;
 
 ReadStreamSharedPtr DirectoryAdapter::open (const std::filesystem::path& path) const {
-    auto finalpath = std::filesystem::canonical(this->basepath / path);
+    auto finalpath = std::filesystem::canonical (this->basepath / path);
 
     if (finalpath.string ().find (this->basepath.string ()) != 0) {
         throw std::filesystem::filesystem_error ("Cannot find file", path, std::error_code ());
@@ -26,12 +26,12 @@ ReadStreamSharedPtr DirectoryAdapter::open (const std::filesystem::path& path) c
         throw std::filesystem::filesystem_error ("Expected file but found a directory", path, std::error_code ());
     }
 
-    return std::make_shared <std::ifstream> (finalpath);
+    return std::make_shared<std::ifstream> (finalpath);
 }
 
 bool DirectoryAdapter::exists (const std::filesystem::path& path) const {
     try {
-        const auto finalpath = std::filesystem::canonical(this->basepath / path);
+        const auto finalpath = std::filesystem::canonical (this->basepath / path);
 
         if (finalpath.string ().find (this->basepath.string ()) != 0) {
             return false;
@@ -54,7 +54,7 @@ bool DirectoryAdapter::exists (const std::filesystem::path& path) const {
 }
 
 std::filesystem::path DirectoryAdapter::physicalPath (const std::filesystem::path& path) const {
-    auto finalpath = std::filesystem::canonical(this->basepath / path);
+    auto finalpath = std::filesystem::canonical (this->basepath / path);
 
     if (finalpath.string ().find (this->basepath.string ()) != 0) {
         throw std::filesystem::filesystem_error ("Cannot find file", path, std::error_code ());
@@ -62,7 +62,6 @@ std::filesystem::path DirectoryAdapter::physicalPath (const std::filesystem::pat
 
     return finalpath;
 }
-
 
 bool DirectoryFactory::handlesMountpoint (const std::filesystem::path& path) const {
     const auto finalpath = std::filesystem::canonical (path);

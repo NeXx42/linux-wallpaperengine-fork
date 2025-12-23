@@ -4,6 +4,7 @@
 
 namespace WallpaperEngine::Testing::Harnesses {
 using namespace WallpaperEngine::Testing::Render;
+
 /**
  * Set of tools to interact and inspect what the render is doing
  *
@@ -16,6 +17,7 @@ class RenderHarness {
     static RenderHarness* build (std::filesystem::path base);
 
     ~RenderHarness ();
+
   protected:
     RenderHarness (ApplicationContext* context, WallpaperApplication* app);
 

@@ -5,8 +5,8 @@
 #include <glm/glm.hpp>
 #include <utility>
 
-#include "Types.h"
 #include "Object.h"
+#include "Types.h"
 #include "WallpaperEngine/Data/Utils/TypeCaster.h"
 
 namespace WallpaperEngine::Data::Model {
@@ -19,21 +19,20 @@ struct WallpaperData {
 
 class Wallpaper : public TypeCaster, public WallpaperData {
   public:
-    explicit Wallpaper (WallpaperData data) noexcept : TypeCaster (), WallpaperData (std::move(data)) {};
+    explicit Wallpaper (WallpaperData data) noexcept : TypeCaster (), WallpaperData (std::move (data)) {};
     ~Wallpaper () override = default;
 };
 
 class Video final : public Wallpaper {
   public:
-    explicit Video (WallpaperData data) noexcept : Wallpaper (std::move(data)) {}
+    explicit Video (WallpaperData data) noexcept : Wallpaper (std::move (data)) {}
 
     ~Video () override = default;
 };
 
-
 class Web final : public Wallpaper {
   public:
-    explicit Web (WallpaperData data) noexcept : Wallpaper (std::move(data)) {}
+    explicit Web (WallpaperData data) noexcept : Wallpaper (std::move (data)) {}
 
     ~Web () override = default;
 };
@@ -44,6 +43,7 @@ struct SceneData {
         glm::vec3 skylight;
         UserSettingUniquePtr clear;
     } colors;
+
     /**
      * Camera configuration
      */
@@ -64,6 +64,7 @@ struct SceneData {
             /** Bloom's threshold to pass onto the shader */
             UserSettingUniquePtr threshold;
         } bloom;
+
         /**
          * Parallax effect configuration
          */
@@ -108,7 +109,9 @@ struct SceneData {
 
 class Scene final : public Wallpaper, public SceneData {
   public:
-    explicit Scene (WallpaperData data, SceneData sceneData) noexcept : Wallpaper (std::move (data)), SceneData (std::move (sceneData)) {}
+    explicit Scene (WallpaperData data, SceneData sceneData) noexcept :
+        Wallpaper (std::move (data)),
+        SceneData (std::move (sceneData)) {}
 
     ~Scene () override = default;
 };

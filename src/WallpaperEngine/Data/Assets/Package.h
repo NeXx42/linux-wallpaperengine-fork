@@ -20,4 +20,4 @@ struct Package {
     FileEntryList files;
     uint32_t baseOffset;
 };
-}
+} // namespace WallpaperEngine::Data::Assets

@@ -4,8 +4,7 @@
 
 using namespace WallpaperEngine::Render::Drivers::Output;
 
-WaylandOutput::WaylandOutput (ApplicationContext& context, WaylandOpenGLDriver& driver) :
-    Output (context, driver) {
+WaylandOutput::WaylandOutput (ApplicationContext& context, WaylandOpenGLDriver& driver) : Output (context, driver) {
     updateViewports ();
 }
 

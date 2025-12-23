@@ -12,7 +12,6 @@ const std::string& ShaderVariable::getName () const {
     return this->m_name;
 }
 
-
 void ShaderVariable::setIdentifierName (std::string identifierName) {
     this->m_identifierName = std::move (identifierName);
 }

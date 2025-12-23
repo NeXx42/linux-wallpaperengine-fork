@@ -11,13 +11,12 @@ SubprocessApp::SubprocessApp (WallpaperEngine::Application::WallpaperApplication
     }
 }
 
-void SubprocessApp::OnRegisterCustomSchemes (CefRawPtr <CefSchemeRegistrar> registrar) {
+void SubprocessApp::OnRegisterCustomSchemes (CefRawPtr<CefSchemeRegistrar> registrar) {
     // register all the needed schemes, "wp" + the background id is going to be our scheme
     for (const auto& workshopId : this->m_handlerFactories | std::views::keys) {
-        registrar->AddCustomScheme (
-            WPSchemeHandlerFactory::generateSchemeName (workshopId),
-            CEF_SCHEME_OPTION_STANDARD | CEF_SCHEME_OPTION_SECURE | CEF_SCHEME_OPTION_FETCH_ENABLED
-        );
+        registrar->AddCustomScheme (WPSchemeHandlerFactory::generateSchemeName (workshopId),
+                                    CEF_SCHEME_OPTION_STANDARD | CEF_SCHEME_OPTION_SECURE |
+                                        CEF_SCHEME_OPTION_FETCH_ENABLED);
     }
 }
 

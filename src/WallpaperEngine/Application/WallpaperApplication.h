@@ -24,6 +24,7 @@
 namespace WallpaperEngine::Application {
 using namespace WallpaperEngine::Assets;
 using namespace WallpaperEngine::Data::Model;
+
 /**
  * Small wrapper class over the actual wallpaper's main application skeleton
  */
@@ -138,15 +139,15 @@ class WallpaperApplication {
     std::map<std::string, ProjectUniquePtr> m_backgrounds {};
     std::map<std::string, ActivePlaylist> m_activePlaylists {};
 
-    std::unique_ptr <WallpaperEngine::Audio::Drivers::Detectors::AudioPlayingDetector> m_audioDetector = nullptr;
-    std::unique_ptr <WallpaperEngine::Audio::AudioContext> m_audioContext = nullptr;
-    std::unique_ptr <WallpaperEngine::Audio::Drivers::SDLAudioDriver> m_audioDriver = nullptr;
-    std::unique_ptr <WallpaperEngine::Audio::Drivers::Recorders::PlaybackRecorder> m_audioRecorder = nullptr;
-    std::unique_ptr <WallpaperEngine::Render::RenderContext> m_renderContext = nullptr;
-    std::unique_ptr <WallpaperEngine::Render::Drivers::VideoDriver> m_videoDriver = nullptr;
-    std::unique_ptr <WallpaperEngine::Render::Drivers::Detectors::FullScreenDetector> m_fullScreenDetector = nullptr;
-    std::unique_ptr <WallpaperEngine::WebBrowser::WebBrowserContext> m_browserContext = nullptr;
-    std::mt19937 m_playlistRng {std::random_device {} ()};
+    std::unique_ptr<WallpaperEngine::Audio::Drivers::Detectors::AudioPlayingDetector> m_audioDetector = nullptr;
+    std::unique_ptr<WallpaperEngine::Audio::AudioContext> m_audioContext = nullptr;
+    std::unique_ptr<WallpaperEngine::Audio::Drivers::SDLAudioDriver> m_audioDriver = nullptr;
+    std::unique_ptr<WallpaperEngine::Audio::Drivers::Recorders::PlaybackRecorder> m_audioRecorder = nullptr;
+    std::unique_ptr<WallpaperEngine::Render::RenderContext> m_renderContext = nullptr;
+    std::unique_ptr<WallpaperEngine::Render::Drivers::VideoDriver> m_videoDriver = nullptr;
+    std::unique_ptr<WallpaperEngine::Render::Drivers::Detectors::FullScreenDetector> m_fullScreenDetector = nullptr;
+    std::unique_ptr<WallpaperEngine::WebBrowser::WebBrowserContext> m_browserContext = nullptr;
+    std::mt19937 m_playlistRng {std::random_device {}()};
     bool m_isPaused = false;
     std::chrono::steady_clock::time_point m_pauseStart {};
 };

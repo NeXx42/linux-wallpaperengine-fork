@@ -20,19 +20,8 @@ using namespace WallpaperEngine::Data::Utils::SFINAE;
 
 class JsonExtensions;
 
-using JSON = nlohmann::basic_json<
-    std::map,
-    std::vector,
-    std::string,
-    bool,
-    std::int64_t,
-    std::uint64_t,
-    double,
-    std::allocator,
-    nlohmann::adl_serializer,
-    std::vector<std::uint8_t>,
-    JsonExtensions
->;
+using JSON = nlohmann::basic_json<std::map, std::vector, std::string, bool, std::int64_t, std::uint64_t, double,
+                                  std::allocator, nlohmann::adl_serializer, std::vector<std::uint8_t>, JsonExtensions>;
 
 /**
  * Small extensions class that is used as base class of nlohmann's implementation.
@@ -44,20 +33,21 @@ class JsonExtensions {
   public:
     using base_type = JSON;
 
-    template <typename T, typename std::enable_if_t<is_glm_vec<T>::value, int> = 0>
-    [[nodiscard]] T get () const {
+    template <typename T, typename std::enable_if_t<is_glm_vec<T>::value, int> = 0> [[nodiscard]] T get () const {
         constexpr int length = GlmVecTraits<T>::length;
         constexpr glm::qualifier qualifier = GlmVecTraits<T>::qualifier;
 
         // call the specialized version of the function
-        return get <length, typename GlmVecTraits<T>::type, qualifier> ();
+        return get<length, typename GlmVecTraits<T>::type, qualifier> ();
     }
+
     template <int length, typename type, glm::qualifier qualifier>
-    [[nodiscard]] glm::vec <length, type, qualifier> get () const {
-        return VectorBuilder::parse <length, type, qualifier> (this->base ().get <std::string> ());
+    [[nodiscard]] glm::vec<length, type, qualifier> get () const {
+        return VectorBuilder::parse<length, type, qualifier> (this->base ().get<std::string> ());
     }
+
     [[nodiscard]] base_type require (const std::string& key, const std::string& message) const {
-        auto base  =  this->base ();
+        auto base = this->base ();
         const auto it = base.find (key);
 
         if (it == base.end ()) {
@@ -66,8 +56,8 @@ class JsonExtensions {
 
         return *it;
     }
-    template <typename T>
-    [[nodiscard]] T require (const std::string& key, const std::string& message) const {
+
+    template <typename T> [[nodiscard]] T require (const std::string& key, const std::string& message) const {
         auto base = this->base ();
         const auto it = base.find (key);
 
@@ -77,7 +67,8 @@ class JsonExtensions {
 
         return (*it);
     }
-    [[nodiscard]] std::optional <base_type> optional (const std::string& key) const noexcept {
+
+    [[nodiscard]] std::optional<base_type> optional (const std::string& key) const noexcept {
         auto base = this->base ();
         const auto it = base.find (key);
         auto result = std::optional<base_type> {};
@@ -88,8 +79,8 @@ class JsonExtensions {
 
         return result;
     }
-    template <typename T>
-    [[nodiscard]] std::optional <T> optional (const std::string& key) const noexcept {
+
+    template <typename T> [[nodiscard]] std::optional<T> optional (const std::string& key) const noexcept {
         auto base = this->base ();
         const auto it = base.find (key);
 
@@ -99,8 +90,8 @@ class JsonExtensions {
 
         return *it;
     }
-    template <typename T>
-    [[nodiscard]] T optional (const std::string& key, T defaultValue) const noexcept {
+
+    template <typename T> [[nodiscard]] T optional (const std::string& key, T defaultValue) const noexcept {
         auto base = this->base ();
         const auto it = base.find (key);
 
@@ -110,13 +101,16 @@ class JsonExtensions {
 
         return (*it);
     }
+
     [[nodiscard]] UserSettingUniquePtr user (const std::string& key, const Properties& properties) const;
+
     template <typename T>
-    [[nodiscard]] UserSettingUniquePtr user (const std::string& key, const Properties& properties, T defaultValue) const {
+    [[nodiscard]] UserSettingUniquePtr user (const std::string& key, const Properties& properties,
+                                             T defaultValue) const {
         const auto value = this->optional (key);
 
         if (!value.has_value ()) {
-            return UserSettingBuilder::fromValue <T> (defaultValue);
+            return UserSettingBuilder::fromValue<T> (defaultValue);
         }
 
         // performs a second lookup, but handles the actual call to UserSettingParser outside of this header
@@ -124,17 +118,16 @@ class JsonExtensions {
         return this->user (key, properties);
     }
 
-    template <int length, typename type, glm::qualifier qualifier>
-    operator glm::vec <length, type, qualifier> () const {
-        return get <length, type, qualifier> ();
+    template <int length, typename type, glm::qualifier qualifier> operator glm::vec<length, type, qualifier> () const {
+        return get<length, type, qualifier> ();
     }
-    template <typename T, typename std::enable_if_t<is_glm_vec<T>::value> = 0>
-    operator T () const {
+
+    template <typename T, typename std::enable_if_t<is_glm_vec<T>::value> = 0> operator T () const {
         constexpr int length = GlmVecTraits<T>::length;
         constexpr glm::qualifier qualifier = GlmVecTraits<T>::qualifier;
 
         // call the specialized version of the function
-        return operator glm::vec <length, typename GlmVecTraits<T>::type, qualifier> ();
+        return operator glm::vec<length, typename GlmVecTraits<T>::type, qualifier> ();
     }
 
   private:

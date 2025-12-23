@@ -9,15 +9,12 @@
 
 using namespace WallpaperEngine::WebBrowser::CEF;
 
-WPSchemeHandler::WPSchemeHandler(const Project& project) :
+WPSchemeHandler::WPSchemeHandler (const Project& project) :
     m_project (project),
-    m_assetLoader (*this->m_project.assetLocator) {
-}
+    m_assetLoader (*this->m_project.assetLocator) {}
 
-bool WPSchemeHandler::Open(CefRefPtr<CefRequest> request,
-                             bool& handle_request,
-                             CefRefPtr<CefCallback> callback) {
-    DCHECK(!CefCurrentlyOn(TID_UI) && !CefCurrentlyOn(TID_IO));
+bool WPSchemeHandler::Open (CefRefPtr<CefRequest> request, bool& handle_request, CefRefPtr<CefCallback> callback) {
+    DCHECK (!CefCurrentlyOn (TID_UI) && !CefCurrentlyOn (TID_IO));
 
 #if !NDEBUG
     std::cout << "Processing request for path " << request->GetURL ().c_str () << std::endl;
@@ -31,10 +28,10 @@ bool WPSchemeHandler::Open(CefRefPtr<CefRequest> request,
         return false;
     }
 
-    const std::string host = CefString(&parts.host);
-    const std::string path = CefString(&parts.path);
+    const std::string host = CefString (&parts.host);
+    const std::string path = CefString (&parts.path);
 
-    const std::string file = path.substr(1);
+    const std::string file = path.substr (1);
 
     try {
         // try to read the file on the current container, if the file doesn't exists
@@ -58,11 +55,9 @@ bool WPSchemeHandler::Open(CefRefPtr<CefRequest> request,
     return true;
 }
 
-
-void WPSchemeHandler::GetResponseHeaders(CefRefPtr<CefResponse> response,
-                         int64_t& response_length,
-                         CefString& redirectUrl) {
-    CEF_REQUIRE_IO_THREAD();
+void WPSchemeHandler::GetResponseHeaders (CefRefPtr<CefResponse> response, int64_t& response_length,
+                                          CefString& redirectUrl) {
+    CEF_REQUIRE_IO_THREAD ();
 
     if (!this->m_contents) {
         response->SetError (ERR_FILE_NOT_FOUND);
@@ -79,12 +74,12 @@ void WPSchemeHandler::GetResponseHeaders(CefRefPtr<CefResponse> response,
 }
 
 void WPSchemeHandler::Cancel () {
-    CEF_REQUIRE_IO_THREAD();
+    CEF_REQUIRE_IO_THREAD ();
 }
 
-bool WPSchemeHandler::Read(void* data_out, int bytes_to_read, int& bytes_read,
-                             CefRefPtr<CefResourceReadCallback> callback) {
-    DCHECK(!CefCurrentlyOn(TID_UI) && !CefCurrentlyOn(TID_IO));
+bool WPSchemeHandler::Read (void* data_out, int bytes_to_read, int& bytes_read,
+                            CefRefPtr<CefResourceReadCallback> callback) {
+    DCHECK (!CefCurrentlyOn (TID_UI) && !CefCurrentlyOn (TID_IO));
 
     bytes_read = 0;
 

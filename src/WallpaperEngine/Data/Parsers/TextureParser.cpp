@@ -1,5 +1,5 @@
-#include <cstring>
 #include <cmath>
+#include <cstring>
 
 #include <lz4.h>
 #include <nlohmann/json.hpp>
@@ -56,8 +56,7 @@ MipmapSharedPtr TextureParser::parseMipmap (const BinaryReader& file, const Text
     result->width = file.nextUInt32 ();
     result->height = file.nextUInt32 ();
 
-    if (header.containerVersion == ContainerVersion_TEXB0004 ||
-        header.containerVersion == ContainerVersion_TEXB0003 ||
+    if (header.containerVersion == ContainerVersion_TEXB0004 || header.containerVersion == ContainerVersion_TEXB0003 ||
         header.containerVersion == ContainerVersion_TEXB0002) {
         result->compression = file.nextUInt32 ();
         result->uncompressedSize = file.nextInt ();
@@ -71,17 +70,15 @@ MipmapSharedPtr TextureParser::parseMipmap (const BinaryReader& file, const Text
         result->uncompressedSize = result->compressedSize;
     }
 
-    result->uncompressedData = std::unique_ptr<char[]> (new char [result->uncompressedSize]);
+    result->uncompressedData = std::unique_ptr<char []> (new char [result->uncompressedSize]);
 
     if (result->compression == 1) {
-        result->compressedData = std::unique_ptr<char[]> (new char [result->compressedSize]);
+        result->compressedData = std::unique_ptr<char []> (new char [result->compressedSize]);
         // read the compressed data into the buffer
         file.next (result->compressedData.get (), result->compressedSize);
         // finally decompress it
-        int bytes = LZ4_decompress_safe (
-            result->compressedData.get (), result->uncompressedData.get (), result->compressedSize,
-            result->uncompressedSize
-        );
+        int bytes = LZ4_decompress_safe (result->compressedData.get (), result->uncompressedData.get (),
+                                         result->compressedSize, result->uncompressedSize);
 
         if (bytes < 0)
             sLog.exception ("Cannot decompress texture data, LZ4_decompress_safe returned an error");
@@ -123,16 +120,14 @@ TextureFormat TextureParser::parseTextureFormat (uint32_t value) {
         case TextureFormat_BC7:
         case TextureFormat_RGBa1010102:
         case TextureFormat_RGBA16161616f:
-        case TextureFormat_RGB161616f:
-            return static_cast<TextureFormat> (value);
+        case TextureFormat_RGB161616f: return static_cast<TextureFormat> (value);
 
-        default:
-            sLog.exception ("unknown texture format: ", value);
+        default: sLog.exception ("unknown texture format: ", value);
     }
 }
 
 void TextureParser::parseTextureHeader (Texture& header, const BinaryReader& file) {
-    char magic[9] = { 0 };
+    char magic [9] = {0};
 
     file.next (magic, 9);
 
@@ -143,7 +138,6 @@ void TextureParser::parseTextureHeader (Texture& header, const BinaryReader& fil
 
     if (strncmp (magic, "TEXI0001", 9) != 0)
         sLog.exception ("unexpected texture sub-container type: ", std::string_view (magic, 9));
-
 
     header.format = parseTextureFormat (file.nextUInt32 ());
     header.flags = parseTextureFlags (file.nextUInt32 ());
@@ -157,7 +151,7 @@ void TextureParser::parseTextureHeader (Texture& header, const BinaryReader& fil
 }
 
 void TextureParser::parseContainer (Texture& header, const BinaryReader& file) {
-    char magic[9] = { 0 };
+    char magic [9] = {0};
 
     file.next (magic, 9);
 
@@ -189,7 +183,7 @@ void TextureParser::parseContainer (Texture& header, const BinaryReader& file) {
 }
 
 void TextureParser::parseAnimations (Texture& header, const BinaryReader& file) {
-    char magic[9] = { 0 };
+    char magic [9] = {0};
 
     // image is animated, keep parsing the rest of the image info
     file.next (magic, 9);
@@ -228,7 +222,8 @@ void TextureParser::parseAnimations (Texture& header, const BinaryReader& file) 
 
         if (frameWidth > 0.0f && frameHeight > 0.0f) {
             const uint32_t cols = static_cast<uint32_t> (std::round (static_cast<double> (header.width) / frameWidth));
-            const uint32_t rows = static_cast<uint32_t> (std::round (static_cast<double> (header.height) / frameHeight));
+            const uint32_t rows =
+                static_cast<uint32_t> (std::round (static_cast<double> (header.height) / frameHeight));
             const uint32_t frameCount = static_cast<uint32_t> (header.frames.size ());
 
             // Only populate spritesheet metadata if the inferred grid can actually hold all frames
@@ -295,16 +290,14 @@ FIF TextureParser::parseFIF (uint32_t value) {
         case FIF_PICT:
         case FIF_RAW:
         case FIF_WEBP:
-        case FIF_JXR:
-            return static_cast<FIF> (value);
+        case FIF_JXR: return static_cast<FIF> (value);
 
-        default:
-            sLog.exception ("unknown free image format: ", value);
+        default: sLog.exception ("unknown free image format: ", value);
     }
 }
 
 TextureUniquePtr TextureParser::parse (const BinaryReader& file, const std::string& filename,
-                                       std::function<std::string(const std::string&)> metadataLoader) {
+                                       std::function<std::string (const std::string&)> metadataLoader) {
     // Parse the binary .tex file first
     auto result = parse (file);
 
@@ -317,16 +310,16 @@ TextureUniquePtr TextureParser::parse (const BinaryReader& file, const std::stri
 }
 
 void TextureParser::parseSpritesheetMetadata (Texture& header, const std::string& filename,
-                                              std::function<std::string(const std::string&)> metadataLoader) {
+                                              std::function<std::string (const std::string&)> metadataLoader) {
     try {
         std::string texJsonContent = metadataLoader (filename + ".tex-json");
         nlohmann::json texJson = nlohmann::json::parse (texJsonContent);
 
         // Check for spritesheet sequences
-        if (texJson.contains ("spritesheetsequences") && texJson["spritesheetsequences"].is_array ()) {
-            auto& sequences = texJson["spritesheetsequences"];
+        if (texJson.contains ("spritesheetsequences") && texJson ["spritesheetsequences"].is_array ()) {
+            auto& sequences = texJson ["spritesheetsequences"];
             if (!sequences.empty ()) {
-                auto& firstSeq = sequences[0];
+                auto& firstSeq = sequences [0];
                 int frames = firstSeq.value ("frames", 0);
                 float frameWidth = firstSeq.value ("width", 0.0f);
                 float frameHeight = firstSeq.value ("height", 0.0f);

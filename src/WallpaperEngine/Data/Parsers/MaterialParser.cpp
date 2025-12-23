@@ -15,14 +15,14 @@ MaterialUniquePtr MaterialParser::load (const Project& project, const std::strin
 }
 
 MaterialUniquePtr MaterialParser::parse (const JSON& it, const std::string& filename, const Project& project) {
-    return std::make_unique <Material> (Material {
+    return std::make_unique<Material> (Material {
         .filename = filename,
         .passes = parsePasses (it.require ("passes", "Material must have passes to render"), project),
     });
 }
 
-std::vector <MaterialPassUniquePtr> MaterialParser::parsePasses (const JSON& it, const Project& project) {
-    std::vector <MaterialPassUniquePtr> result = {};
+std::vector<MaterialPassUniquePtr> MaterialParser::parsePasses (const JSON& it, const Project& project) {
+    std::vector<MaterialPassUniquePtr> result = {};
 
     if (!it.is_array ()) {
         return result;
@@ -41,13 +41,13 @@ MaterialPassUniquePtr MaterialParser::parsePass (const JSON& it, const Project& 
     const auto combos = it.optional ("combos");
     const auto constants = it.optional ("constantshadervalues");
 
-    return std::make_unique <MaterialPass>(MaterialPass {
-        //TODO: REMOVE THIS UGLY STD::STRING CREATION
+    return std::make_unique<MaterialPass> (MaterialPass {
+        // TODO: REMOVE THIS UGLY STD::STRING CREATION
         .blending = parseBlendMode (it.optional ("blending", std::string ("normal"))),
         .cullmode = parseCullMode (it.optional ("cullmode", std::string ("nocull"))),
         .depthtest = parseDepthtestMode (it.optional ("depthtest", std::string ("disabled"))),
         .depthwrite = parseDepthwriteMode (it.optional ("depthwrite", std::string ("disabled"))),
-        .shader = it.require <std::string> ("shader", "Material pass must have a shader"),
+        .shader = it.require<std::string> ("shader", "Material pass must have a shader"),
         .textures = textures.has_value () ? parseTextures (*textures) : TextureMap {},
         .usertextures = usertextures.has_value () ? parseTextures (*usertextures) : TextureMap {},
         .combos = combos.has_value () ? parseCombos (*combos) : ComboMap {},
@@ -55,8 +55,8 @@ MaterialPassUniquePtr MaterialParser::parsePass (const JSON& it, const Project& 
     });
 }
 
-std::map <int, std::string> MaterialParser::parseTextures (const JSON& it) {
-    std::map <int, std::string> result = {};
+std::map<int, std::string> MaterialParser::parseTextures (const JSON& it) {
+    std::map<int, std::string> result = {};
 
     if (!it.is_array ()) {
         return result;
@@ -80,8 +80,8 @@ std::map <int, std::string> MaterialParser::parseTextures (const JSON& it) {
     return result;
 }
 
-std::map <std::string, int> MaterialParser::parseCombos (const JSON& it) {
-    std::map <std::string, int> result = {};
+std::map<std::string, int> MaterialParser::parseCombos (const JSON& it) {
+    std::map<std::string, int> result = {};
 
     if (!it.is_object ()) {
         return result;

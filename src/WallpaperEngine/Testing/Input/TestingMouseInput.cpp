@@ -2,9 +2,7 @@
 
 using namespace WallpaperEngine::Testing::Input;
 
-
-void TestingMouseInput::update () {
-}
+void TestingMouseInput::update () {}
 
 glm::dvec2 TestingMouseInput::position () const {
     return {};

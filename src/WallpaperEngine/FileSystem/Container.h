@@ -69,4 +69,4 @@ class Container {
 };
 
 using ContainerUniquePtr = std::unique_ptr<Container>;
-}
+} // namespace WallpaperEngine::FileSystem

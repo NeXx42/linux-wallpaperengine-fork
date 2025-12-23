@@ -92,36 +92,35 @@ DynamicValue::UnderlyingType DynamicValue::getType () const {
 
 std::string DynamicValue::toString () const {
     switch (this->m_type) {
-        case UnderlyingType::Float:
-            return std::to_string (this->m_float);
-        case UnderlyingType::Int:
-            return std::to_string (this->m_int);
-        case UnderlyingType::Boolean:
-            return std::to_string (this->m_bool);
-        case UnderlyingType::Vec2:
-            return std::to_string (this->m_vec2.x) + ", " + std::to_string (this->m_vec2.y);
+        case UnderlyingType::Float: return std::to_string (this->m_float);
+        case UnderlyingType::Int: return std::to_string (this->m_int);
+        case UnderlyingType::Boolean: return std::to_string (this->m_bool);
+        case UnderlyingType::Vec2: return std::to_string (this->m_vec2.x) + ", " + std::to_string (this->m_vec2.y);
         case UnderlyingType::Vec3:
-            return std::to_string (this->m_vec3.x) + ", " + std::to_string (this->m_vec3.y) + ", " + std::to_string (this->m_vec3.z);
+            return std::to_string (this->m_vec3.x) + ", " + std::to_string (this->m_vec3.y) + ", " +
+                   std::to_string (this->m_vec3.z);
         case UnderlyingType::Vec4:
-            return std::to_string (this->m_vec4.x) + ", " + std::to_string (this->m_vec4.y) + ", " + std::to_string (this->m_vec4.z) + ", " + std::to_string (this->m_vec4.w);
-        case UnderlyingType::IVec2:
-            return std::to_string (this->m_ivec2.x) + ", " + std::to_string (this->m_ivec2.y);
+            return std::to_string (this->m_vec4.x) + ", " + std::to_string (this->m_vec4.y) + ", " +
+                   std::to_string (this->m_vec4.z) + ", " + std::to_string (this->m_vec4.w);
+        case UnderlyingType::IVec2: return std::to_string (this->m_ivec2.x) + ", " + std::to_string (this->m_ivec2.y);
         case UnderlyingType::IVec3:
-            return std::to_string (this->m_ivec3.x) + ", " + std::to_string (this->m_ivec3.y) + ", " + std::to_string (this->m_ivec3.z);
+            return std::to_string (this->m_ivec3.x) + ", " + std::to_string (this->m_ivec3.y) + ", " +
+                   std::to_string (this->m_ivec3.z);
         case UnderlyingType::IVec4:
-            return std::to_string (this->m_ivec4.x) + ", " + std::to_string (this->m_ivec4.y) + ", " + std::to_string (this->m_ivec4.z) + ", " + std::to_string (this->m_ivec4.w);
+            return std::to_string (this->m_ivec4.x) + ", " + std::to_string (this->m_ivec4.y) + ", " +
+                   std::to_string (this->m_ivec4.z) + ", " + std::to_string (this->m_ivec4.w);
         default:
             return "Unknown conversion for dynamic value of type: " + std::to_string (static_cast<int> (this->m_type));
     }
 }
 
 void DynamicValue::update (const float newValue) {
-    this->m_ivec4 = glm::ivec4(static_cast<int> (newValue));
-    this->m_ivec3 = glm::ivec3(static_cast<int> (newValue));
-    this->m_ivec2 = glm::ivec2(static_cast<int> (newValue));
-    this->m_vec4 = glm::vec4(newValue);
-    this->m_vec3 = glm::vec3(newValue);
-    this->m_vec2 = glm::vec2(newValue);
+    this->m_ivec4 = glm::ivec4 (static_cast<int> (newValue));
+    this->m_ivec3 = glm::ivec3 (static_cast<int> (newValue));
+    this->m_ivec2 = glm::ivec2 (static_cast<int> (newValue));
+    this->m_vec4 = glm::vec4 (newValue);
+    this->m_vec3 = glm::vec3 (newValue);
+    this->m_vec2 = glm::vec2 (newValue);
     this->m_float = newValue;
     this->m_int = static_cast<int> (newValue);
     this->m_bool = static_cast<int> (newValue) != 0;
@@ -132,12 +131,12 @@ void DynamicValue::update (const float newValue) {
 }
 
 void DynamicValue::update (const int newValue) {
-    this->m_ivec4 = glm::ivec4(newValue);
-    this->m_ivec3 = glm::ivec3(newValue);
-    this->m_ivec2 = glm::ivec2(newValue);
-    this->m_vec4 = glm::vec4(static_cast<float> (newValue));
-    this->m_vec3 = glm::vec3(static_cast<float> (newValue));
-    this->m_vec2 = glm::vec2(static_cast<float> (newValue));
+    this->m_ivec4 = glm::ivec4 (newValue);
+    this->m_ivec3 = glm::ivec3 (newValue);
+    this->m_ivec2 = glm::ivec2 (newValue);
+    this->m_vec4 = glm::vec4 (static_cast<float> (newValue));
+    this->m_vec3 = glm::vec3 (static_cast<float> (newValue));
+    this->m_vec2 = glm::vec2 (static_cast<float> (newValue));
     this->m_float = static_cast<float> (newValue);
     this->m_int = newValue;
     this->m_bool = newValue != 0;
@@ -148,12 +147,12 @@ void DynamicValue::update (const int newValue) {
 }
 
 void DynamicValue::update (const bool newValue) {
-    this->m_ivec4 = glm::ivec4(newValue);
-    this->m_ivec3 = glm::ivec3(newValue);
-    this->m_ivec2 = glm::ivec2(newValue);
-    this->m_vec4 = glm::vec4(newValue);
-    this->m_vec3 = glm::vec3(newValue);
-    this->m_vec2 = glm::vec2(newValue);
+    this->m_ivec4 = glm::ivec4 (newValue);
+    this->m_ivec3 = glm::ivec3 (newValue);
+    this->m_ivec2 = glm::ivec2 (newValue);
+    this->m_vec4 = glm::vec4 (newValue);
+    this->m_vec3 = glm::vec3 (newValue);
+    this->m_vec2 = glm::vec2 (newValue);
     this->m_float = newValue;
     this->m_int = newValue;
     this->m_bool = newValue;
@@ -163,13 +162,13 @@ void DynamicValue::update (const bool newValue) {
     this->propagate ();
 }
 
-void DynamicValue::update(const glm::vec2& newValue) {
-    this->m_ivec4 = glm::ivec4(newValue, 0, 0);
-    this->m_ivec3 = glm::ivec3(newValue, 0);
-    this->m_ivec2 = glm::ivec2(newValue);
+void DynamicValue::update (const glm::vec2& newValue) {
+    this->m_ivec4 = glm::ivec4 (newValue, 0, 0);
+    this->m_ivec3 = glm::ivec3 (newValue, 0);
+    this->m_ivec2 = glm::ivec2 (newValue);
     this->m_vec2 = newValue;
-    this->m_vec3 = glm::vec3(newValue, 0.0f);
-    this->m_vec4 = glm::vec4(newValue, 0.0f, 0.0f);
+    this->m_vec3 = glm::vec3 (newValue, 0.0f);
+    this->m_vec4 = glm::vec4 (newValue, 0.0f, 0.0f);
     this->m_float = newValue.x;
     this->m_int = static_cast<int> (newValue.x);
     this->m_bool = newValue.x != 0.0f;
@@ -179,13 +178,13 @@ void DynamicValue::update(const glm::vec2& newValue) {
     this->propagate ();
 }
 
-void DynamicValue::update(const glm::vec3& newValue) {
-    this->m_ivec4 = glm::ivec4(newValue, 0);
-    this->m_ivec3 = glm::ivec3(newValue);
-    this->m_ivec2 = glm::ivec2(newValue);
-    this->m_vec2 = glm::vec2(newValue);
+void DynamicValue::update (const glm::vec3& newValue) {
+    this->m_ivec4 = glm::ivec4 (newValue, 0);
+    this->m_ivec3 = glm::ivec3 (newValue);
+    this->m_ivec2 = glm::ivec2 (newValue);
+    this->m_vec2 = glm::vec2 (newValue);
     this->m_vec3 = newValue;
-    this->m_vec4 = glm::vec4(newValue, 0.0f);
+    this->m_vec4 = glm::vec4 (newValue, 0.0f);
     this->m_float = newValue.x;
     this->m_int = static_cast<int> (newValue.x);
     this->m_bool = newValue.x != 0.0f;
@@ -195,12 +194,12 @@ void DynamicValue::update(const glm::vec3& newValue) {
     this->propagate ();
 }
 
-void DynamicValue::update(const glm::vec4& newValue) {
-    this->m_ivec4 = glm::ivec4(newValue);
-    this->m_ivec3 = glm::ivec3(newValue);
-    this->m_ivec2 = glm::ivec2(newValue);
-    this->m_vec2 = glm::vec2(newValue);
-    this->m_vec3 = glm::vec3(newValue);
+void DynamicValue::update (const glm::vec4& newValue) {
+    this->m_ivec4 = glm::ivec4 (newValue);
+    this->m_ivec3 = glm::ivec3 (newValue);
+    this->m_ivec2 = glm::ivec2 (newValue);
+    this->m_vec2 = glm::vec2 (newValue);
+    this->m_vec3 = glm::vec3 (newValue);
     this->m_vec4 = newValue;
     this->m_float = newValue.x;
     this->m_int = static_cast<int> (newValue.x);
@@ -211,13 +210,13 @@ void DynamicValue::update(const glm::vec4& newValue) {
     this->propagate ();
 }
 
-void DynamicValue::update(const glm::ivec2& newValue) {
-    this->m_ivec4 = glm::ivec4(newValue, 0, 0);
-    this->m_ivec3 = glm::ivec3(newValue, 0);
-    this->m_ivec2 = glm::ivec2(newValue);
+void DynamicValue::update (const glm::ivec2& newValue) {
+    this->m_ivec4 = glm::ivec4 (newValue, 0, 0);
+    this->m_ivec3 = glm::ivec3 (newValue, 0);
+    this->m_ivec2 = glm::ivec2 (newValue);
     this->m_vec2 = newValue;
-    this->m_vec3 = glm::vec3(newValue, 0.0f);
-    this->m_vec4 = glm::vec4(newValue, 0.0f, 0.0f);
+    this->m_vec3 = glm::vec3 (newValue, 0.0f);
+    this->m_vec4 = glm::vec4 (newValue, 0.0f, 0.0f);
     this->m_float = static_cast<float> (newValue.x);
     this->m_int = static_cast<int> (newValue.x);
     this->m_bool = newValue.x != 0;
@@ -227,13 +226,13 @@ void DynamicValue::update(const glm::ivec2& newValue) {
     this->propagate ();
 }
 
-void DynamicValue::update(const glm::ivec3& newValue) {
-    this->m_ivec4 = glm::ivec4(newValue, 0);
-    this->m_ivec3 = glm::ivec3(newValue);
-    this->m_ivec2 = glm::ivec2(newValue);
-    this->m_vec2 = glm::vec2(newValue);
+void DynamicValue::update (const glm::ivec3& newValue) {
+    this->m_ivec4 = glm::ivec4 (newValue, 0);
+    this->m_ivec3 = glm::ivec3 (newValue);
+    this->m_ivec2 = glm::ivec2 (newValue);
+    this->m_vec2 = glm::vec2 (newValue);
     this->m_vec3 = newValue;
-    this->m_vec4 = glm::vec4(newValue, 0.0f);
+    this->m_vec4 = glm::vec4 (newValue, 0.0f);
     this->m_float = static_cast<float> (newValue.x);
     this->m_int = static_cast<int> (newValue.x);
     this->m_bool = newValue.x != 0;
@@ -243,12 +242,12 @@ void DynamicValue::update(const glm::ivec3& newValue) {
     this->propagate ();
 }
 
-void DynamicValue::update(const glm::ivec4& newValue) {
-    this->m_ivec4 = glm::ivec4(newValue);
-    this->m_ivec3 = glm::ivec3(newValue);
-    this->m_ivec2 = glm::ivec2(newValue);
-    this->m_vec2 = glm::vec2(newValue);
-    this->m_vec3 = glm::vec3(newValue);
+void DynamicValue::update (const glm::ivec4& newValue) {
+    this->m_ivec4 = glm::ivec4 (newValue);
+    this->m_ivec3 = glm::ivec3 (newValue);
+    this->m_ivec2 = glm::ivec2 (newValue);
+    this->m_vec2 = glm::vec2 (newValue);
+    this->m_vec3 = glm::vec3 (newValue);
     this->m_vec4 = newValue;
     this->m_float = static_cast<float> (newValue.x);
     this->m_int = static_cast<int> (newValue.x);
@@ -260,12 +259,12 @@ void DynamicValue::update(const glm::ivec4& newValue) {
 }
 
 void DynamicValue::update (const std::string& newValue) {
-    this->m_ivec4 = glm::ivec4(0);
-    this->m_ivec3 = glm::ivec3(0);
-    this->m_ivec2 = glm::ivec2(0);
-    this->m_vec2 = glm::vec2(0.0f);
-    this->m_vec3 = glm::vec3(0.0f);
-    this->m_vec4 = glm::vec4(0.0f);
+    this->m_ivec4 = glm::ivec4 (0);
+    this->m_ivec3 = glm::ivec3 (0);
+    this->m_ivec2 = glm::ivec2 (0);
+    this->m_vec2 = glm::vec2 (0.0f);
+    this->m_vec3 = glm::vec3 (0.0f);
+    this->m_vec4 = glm::vec4 (0.0f);
     this->m_float = 0.0f;
     this->m_int = 0;
     this->m_bool = false;
@@ -294,12 +293,12 @@ void DynamicValue::update (const DynamicValue& other) {
 }
 
 void DynamicValue::update () {
-    this->m_ivec4 = glm::ivec4(0);
-    this->m_ivec3 = glm::ivec3(0);
-    this->m_ivec2 = glm::ivec2(0);
-    this->m_vec2 = glm::vec2(0.0f);
-    this->m_vec3 = glm::vec3(0.0f);
-    this->m_vec4 = glm::vec4(0.0f);
+    this->m_ivec4 = glm::ivec4 (0);
+    this->m_ivec3 = glm::ivec3 (0);
+    this->m_ivec2 = glm::ivec2 (0);
+    this->m_vec2 = glm::vec2 (0.0f);
+    this->m_vec3 = glm::vec3 (0.0f);
+    this->m_vec4 = glm::vec4 (0.0f);
     this->m_float = 0.0f;
     this->m_int = 0;
     this->m_bool = false;
@@ -356,9 +355,8 @@ void DynamicValue::attachCondition (const ConditionInfo& condition) {
     this->m_condition = condition;
 }
 
-
 void DynamicValue::propagate () const {
     for (const auto& callback : this->m_listeners) {
-        callback(*this);
+        callback (*this);
     }
 }

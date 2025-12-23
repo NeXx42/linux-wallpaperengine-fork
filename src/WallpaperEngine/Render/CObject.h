@@ -14,23 +14,23 @@ namespace WallpaperEngine::Render {
 class CObject : public Helpers::ContextAware {
   public:
     template <class T> [[nodiscard]] const T* as () const {
-        if (is <T> ()) {
-            return static_cast <const T*> (this);
+        if (is<T> ()) {
+            return static_cast<const T*> (this);
         }
 
         throw std::bad_cast ();
     }
 
     template <class T> [[nodiscard]] T* as () {
-        if (is <T> ()) {
-            return static_cast <T*> (this);
+        if (is<T> ()) {
+            return static_cast<T*> (this);
         }
 
         throw std::bad_cast ();
     }
 
     template <class T> [[nodiscard]] bool is () const {
-        return typeid (*this) == typeid(T);
+        return typeid (*this) == typeid (T);
     }
 
     virtual void render () = 0;

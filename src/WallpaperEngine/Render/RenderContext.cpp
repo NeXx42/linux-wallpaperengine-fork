@@ -35,7 +35,7 @@ void RenderContext::render (Drivers::Output::OutputViewport* viewport) {
     viewport->swapOutput ();
 }
 
-void RenderContext::setWallpaper (const std::string& display, std::shared_ptr <CWallpaper> wallpaper) {
+void RenderContext::setWallpaper (const std::string& display, std::shared_ptr<CWallpaper> wallpaper) {
     this->m_wallpapers.insert_or_assign (display, wallpaper);
 }
 
@@ -64,7 +64,7 @@ std::shared_ptr<const TextureProvider> RenderContext::resolveTexture (const std:
     return this->m_textureCache->resolve (name);
 }
 
-const std::map<std::string, std::shared_ptr <CWallpaper>>& RenderContext::getWallpapers () const {
+const std::map<std::string, std::shared_ptr<CWallpaper>>& RenderContext::getWallpapers () const {
     return this->m_wallpapers;
 }
 } // namespace WallpaperEngine::Render

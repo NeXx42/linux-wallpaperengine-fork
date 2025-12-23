@@ -1,9 +1,9 @@
 #pragma once
 
 #include <map>
-#include <vector>
-#include <string>
 #include <optional>
+#include <string>
+#include <vector>
 
 #include "Types.h"
 
@@ -59,7 +59,7 @@ struct Material {
     /** The name of the file this material is defined in */
     std::string filename;
     /** The passes that compose this material */
-    std::vector <MaterialPassUniquePtr> passes;
+    std::vector<MaterialPassUniquePtr> passes;
 };
 
 } // namespace WallpaperEngine::Data::Model

@@ -1,5 +1,5 @@
-#include "GLFWOutputViewport.h"
 #include "GLFWWindowOutput.h"
+#include "GLFWOutputViewport.h"
 #include "WallpaperEngine/Logging/Log.h"
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>

@@ -9,7 +9,7 @@ void TestingCustomGLFWErrorHandler (int errorCode, const char* reason) {
     sLog.error ("GLFW error ", errorCode, ": ", reason);
 }
 
-TestingOpenGLDriver::TestingOpenGLDriver(ApplicationContext& context, WallpaperApplication& app) :
+TestingOpenGLDriver::TestingOpenGLDriver (ApplicationContext& context, WallpaperApplication& app) :
     m_mouseInput (),
     VideoDriver (app, m_mouseInput),
     m_context (context) {
@@ -57,9 +57,8 @@ TestingOpenGLDriver::TestingOpenGLDriver(ApplicationContext& context, WallpaperA
 
 TestingOpenGLDriver::~TestingOpenGLDriver () {
     delete this->m_output;
-    glfwTerminate();
+    glfwTerminate ();
 }
-
 
 Output::Output& TestingOpenGLDriver::getOutput () {
     return *this->m_output;
@@ -72,7 +71,6 @@ void* TestingOpenGLDriver::getProcAddress (const char* name) const {
 float TestingOpenGLDriver::getRenderTime () const {
     return static_cast<float> (glfwGetTime ());
 }
-
 
 bool TestingOpenGLDriver::closeRequested () {
     return glfwWindowShouldClose (this->m_window);
@@ -106,6 +104,7 @@ glm::ivec2 TestingOpenGLDriver::getFramebufferSize () const {
 uint32_t TestingOpenGLDriver::getFrameCounter () const {
     return this->m_frameCounter;
 }
+
 void TestingOpenGLDriver::dispatchEventQueue () {
     static float startTime, endTime, minimumTime = 1.0f / this->m_context.settings.render.maximumFPS;
     // get the start time of the frame
@@ -124,13 +123,14 @@ void TestingOpenGLDriver::dispatchEventQueue () {
                            GL_UNSIGNED_BYTE, this->m_output->getImageBufferSize (), this->m_output->getImageBuffer ());
         } else {
             // fallback to old version
-            glReadPixels (0, 0, this->m_output->getFullWidth (), this->m_output->getFullHeight (), GL_BGRA, GL_UNSIGNED_BYTE, this->m_output->getImageBuffer ());
+            glReadPixels (0, 0, this->m_output->getFullWidth (), this->m_output->getFullHeight (), GL_BGRA,
+                          GL_UNSIGNED_BYTE, this->m_output->getImageBuffer ());
         }
 
-        GLenum error = glGetError();
+        GLenum error = glGetError ();
 
         if (error != GL_NO_ERROR) {
-            sLog.exception("OpenGL error when reading texture ", error);
+            sLog.exception ("OpenGL error when reading texture ", error);
         }
     }
 

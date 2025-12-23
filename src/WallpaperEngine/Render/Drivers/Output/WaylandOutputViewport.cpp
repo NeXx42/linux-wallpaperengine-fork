@@ -1,5 +1,5 @@
-#include "WallpaperEngine/Logging/Log.h"
 #include "WaylandOutputViewport.h"
+#include "WallpaperEngine/Logging/Log.h"
 
 #define class _class
 #define namespace _namespace
@@ -11,7 +11,6 @@ extern "C" {
 #undef class
 #undef namespace
 #undef static
-
 
 using namespace WallpaperEngine::Render::Drivers;
 using namespace WallpaperEngine::Render::Drivers::Output;
@@ -102,7 +101,7 @@ constexpr struct zwlr_layer_surface_v1_listener layerSurfaceListener = {
 };
 
 WaylandOutputViewport::WaylandOutputViewport (WaylandOpenGLDriver* driver, uint32_t waylandName,
-                                                struct wl_registry* registry) :
+                                              struct wl_registry* registry) :
     OutputViewport ({0, 0, 0, 0}, "", true),
     size ({0, 0}),
     waylandName (waylandName),

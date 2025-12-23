@@ -9,25 +9,25 @@ using namespace WallpaperEngine::Data::Model;
 
 StringPrinter::StringPrinter (std::string indentationCharacter) :
     m_out (&this->m_buffer),
-    m_indentationCharacter (std::move(indentationCharacter)) { }
+    m_indentationCharacter (std::move (indentationCharacter)) {}
 
 void StringPrinter::printWallpaper (const Wallpaper& wallpaper) {
-    const bool isScene = wallpaper.is <Scene> ();
-    const bool isVideo = wallpaper.is <Video> ();
-    const bool isWeb = wallpaper.is <Web> ();
+    const bool isScene = wallpaper.is<Scene> ();
+    const bool isVideo = wallpaper.is<Video> ();
+    const bool isWeb = wallpaper.is<Web> ();
 
     if (isVideo) {
-        const auto video = wallpaper.as <Video> ();
+        const auto video = wallpaper.as<Video> ();
 
         this->m_out << "Video wallpaper: " << video->filename;
         this->lineEnd ();
     } else if (isWeb) {
-        const auto web = wallpaper.as <Web> ();
+        const auto web = wallpaper.as<Web> ();
 
         this->m_out << "Web wallpaper: " << web->filename;
         this->lineEnd ();
     } else if (isScene) {
-        const auto scene = wallpaper.as <Scene> ();
+        const auto scene = wallpaper.as<Scene> ();
 
         this->m_out << "Scene wallpaper: ";
         this->increaseIndentation ();
@@ -58,12 +58,12 @@ void StringPrinter::printObject (const Object& object) {
         this->m_out << dependency << ", ";
     }
 
-    if (object.is <Image> ()) {
+    if (object.is<Image> ()) {
         this->lineEnd ();
-        this->printImage (*object.as <Image> ());
-    } else if (object.is <Sound> ()) {
+        this->printImage (*object.as<Image> ());
+    } else if (object.is<Sound> ()) {
         this->lineEnd ();
-        this->printSound (*object.as <Sound> ());
+        this->printSound (*object.as<Sound> ());
     }
 
     this->decreaseIndentation ();
@@ -191,7 +191,7 @@ void StringPrinter::printImageEffectPassOverride (const ImageEffectPassOverride&
 
         for (const auto& [name, value] : imageEffectPass.constants) {
             this->lineEnd ();
-            this->m_out << "Constant " << name << "=" << value->value->toString();
+            this->m_out << "Constant " << name << "=" << value->value->toString ();
         }
 
         this->decreaseIndentation ();
@@ -390,11 +390,11 @@ void StringPrinter::lineEnd () {
 }
 
 void StringPrinter::increaseIndentation () {
-    this->m_level ++;
+    this->m_level++;
 }
 
 void StringPrinter::decreaseIndentation () {
-    this->m_level --;
+    this->m_level--;
 }
 
 std::string StringPrinter::str () const {

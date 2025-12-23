@@ -35,8 +35,8 @@ class WaylandFullScreenDetector final : public FullScreenDetector {
 
     WaylandFullscreenDetectorCallbackData m_callbackData {};
 
-    friend void handleGlobal (
-        void* data, struct wl_registry* registry, uint32_t name, const char* interface, uint32_t version);
+    friend void handleGlobal (void* data, struct wl_registry* registry, uint32_t name, const char* interface,
+                              uint32_t version);
 };
 } // namespace WallpaperEngine::Render::Drivers::Detectors
 

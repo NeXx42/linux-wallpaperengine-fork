@@ -12,15 +12,14 @@ VideoFactories::VideoFactories () {
 
 VideoFactories& VideoFactories::get () {
     if (sInstance == nullptr) {
-        sInstance = std::make_unique <VideoFactories> ();
+        sInstance = std::make_unique<VideoFactories> ();
     }
 
     return *sInstance;
 }
 
-void VideoFactories::registerDriver (
-    ApplicationContext::WINDOW_MODE forMode, std::string xdgSessionType,
-    WallpaperEngine::Render::Drivers::VideoFactories::DriverConstructionFunc factory) {
+void VideoFactories::registerDriver (ApplicationContext::WINDOW_MODE forMode, std::string xdgSessionType,
+                                     WallpaperEngine::Render::Drivers::VideoFactories::DriverConstructionFunc factory) {
     const auto cur = this->m_driverFactories.find (forMode);
 
     if (cur == this->m_driverFactories.end ()) {
@@ -33,7 +32,8 @@ void VideoFactories::registerDriver (
     }
 }
 
-void VideoFactories::registerFullscreenDetector (std::string xdgSessionType, FullscreenDetectorConstructionFunc factory) {
+void VideoFactories::registerFullscreenDetector (std::string xdgSessionType,
+                                                 FullscreenDetectorConstructionFunc factory) {
     this->m_fullscreenFactories.emplace (xdgSessionType, factory);
 }
 
@@ -53,10 +53,10 @@ std::vector<std::string> VideoFactories::getRegisteredDrivers () const {
     return result;
 }
 
-std::unique_ptr <VideoDriver> VideoFactories::createVideoDriver (
-    ApplicationContext::WINDOW_MODE mode, const std::string& xdgSessionType,
-    ApplicationContext& context, WallpaperApplication& application
-) {
+std::unique_ptr<VideoDriver> VideoFactories::createVideoDriver (ApplicationContext::WINDOW_MODE mode,
+                                                                const std::string& xdgSessionType,
+                                                                ApplicationContext& context,
+                                                                WallpaperApplication& application) {
     const auto sessionTypeToFactory = this->m_driverFactories.find (mode);
 
     if (sessionTypeToFactory == this->m_driverFactories.end ()) {
@@ -66,10 +66,9 @@ std::unique_ptr <VideoDriver> VideoFactories::createVideoDriver (
     // windows are a bit special, there's just one handler
     // and it's not like the current map properly allows for storing this
     // so hijacking the detection is probably best for now
-    const auto factory =
-        mode != Application::ApplicationContext::DESKTOP_BACKGROUND
-            ? sessionTypeToFactory->second.find (DEFAULT_WINDOW_NAME)
-            : sessionTypeToFactory->second.find (xdgSessionType);
+    const auto factory = mode != Application::ApplicationContext::DESKTOP_BACKGROUND
+                             ? sessionTypeToFactory->second.find (DEFAULT_WINDOW_NAME)
+                             : sessionTypeToFactory->second.find (xdgSessionType);
 
     if (factory == sessionTypeToFactory->second.end ()) {
         sLog.exception ("Cannot find a driver for window mode ", mode, " and XDG_SESSION_TYPE ", xdgSessionType);
@@ -78,13 +77,12 @@ std::unique_ptr <VideoDriver> VideoFactories::createVideoDriver (
     return factory->second (context, application);
 }
 
-std::unique_ptr <Detectors::FullScreenDetector> VideoFactories::createFullscreenDetector (
-    const std::string& xdgSessionType, ApplicationContext& context, VideoDriver& driver
-) {
+std::unique_ptr<Detectors::FullScreenDetector> VideoFactories::createFullscreenDetector (
+    const std::string& xdgSessionType, ApplicationContext& context, VideoDriver& driver) {
     const auto it = this->m_fullscreenFactories.find (xdgSessionType);
 
     if (it == this->m_fullscreenFactories.end () || !context.settings.render.pauseOnFullscreen) {
-        return std::make_unique <Detectors::FullScreenDetector> (context);
+        return std::make_unique<Detectors::FullScreenDetector> (context);
     }
 
     return it->second (context, driver);

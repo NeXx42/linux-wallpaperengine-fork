@@ -18,33 +18,36 @@
 #include "WallpaperEngine/Data/Builders/VectorBuilder.h"
 #include "WallpaperEngine/FileSystem/Container.h"
 
-#define SHADER_HEADER(filename) "#version 330\n" \
-    "// ======================================================\n" \
-    "// Processed shader " + \
-    filename + \
-    "\n" \
-    "// ======================================================\n" \
-    "precision highp float;\n" \
-    "#define mul(x, y) ((y) * (x))\n" \
-    "#define max(x, y) max (y, x)\n" \
-    "#define lerp mix\n" \
-    "#define frac fract\n" \
-    "#define CAST2(x) (vec2(x))\n" \
-    "#define CAST3(x) (vec3(x))\n" \
-    "#define CAST4(x) (vec4(x))\n" \
-    "#define CAST3X3(x) (mat3(x))\n" \
-    "#define saturate(x) (clamp(x, 0.0, 1.0))\n" \
-    "#define texSample2D texture\n" \
-    "#define texSample2DLod textureLod\n" \
-    "#define log10(x) log2(x) * 0.301029995663981\n" \
-    "#define atan2 atan\n" \
-    "#define fmod(x, y) ((x)-(y)*trunc((x)/(y)))\n" \
-    "#define ddx dFdx\n" \
-    "#define ddy(x) dFdy(-(x))\n" \
-    "#define GLSL 1\n\n";
-#define FRAGMENT_SHADER_DEFINES "out vec4 out_FragColor;\n" \
+#define SHADER_HEADER(filename)                                                                                        \
+    "#version 330\n"                                                                                                   \
+    "// ======================================================\n"                                                      \
+    "// Processed shader " +                                                                                           \
+        filename +                                                                                                     \
+        "\n"                                                                                                           \
+        "// ======================================================\n"                                                  \
+        "precision highp float;\n"                                                                                     \
+        "#define mul(x, y) ((y) * (x))\n"                                                                              \
+        "#define max(x, y) max (y, x)\n"                                                                               \
+        "#define lerp mix\n"                                                                                           \
+        "#define frac fract\n"                                                                                         \
+        "#define CAST2(x) (vec2(x))\n"                                                                                 \
+        "#define CAST3(x) (vec3(x))\n"                                                                                 \
+        "#define CAST4(x) (vec4(x))\n"                                                                                 \
+        "#define CAST3X3(x) (mat3(x))\n"                                                                               \
+        "#define saturate(x) (clamp(x, 0.0, 1.0))\n"                                                                   \
+        "#define texSample2D texture\n"                                                                                \
+        "#define texSample2DLod textureLod\n"                                                                          \
+        "#define log10(x) log2(x) * 0.301029995663981\n"                                                               \
+        "#define atan2 atan\n"                                                                                         \
+        "#define fmod(x, y) ((x)-(y)*trunc((x)/(y)))\n"                                                                \
+        "#define ddx dFdx\n"                                                                                           \
+        "#define ddy(x) dFdy(-(x))\n"                                                                                  \
+        "#define GLSL 1\n\n";
+#define FRAGMENT_SHADER_DEFINES                                                                                        \
+    "out vec4 out_FragColor;\n"                                                                                        \
     "#define varying in\n"
-#define VERTEX_SHADER_DEFINES "#define attribute in\n" \
+#define VERTEX_SHADER_DEFINES                                                                                          \
+    "#define attribute in\n"                                                                                           \
     "#define varying out\n"
 #define DEFINE_COMBO(name, value) "#define " + name + " " + std::to_string (value) + "\n";
 
@@ -52,14 +55,13 @@ using namespace WallpaperEngine::Render;
 using namespace WallpaperEngine::Data::Builders;
 using namespace WallpaperEngine::Render::Shaders;
 
-ShaderUnit::ShaderUnit (
-    const GLSLContext::UnitType type, std::string file, std::string content, const AssetLocator& assetLocator,
-    const ShaderConstantMap& constants, const TextureMap& passTextures, const TextureMap& overrideTextures,
-    const ComboMap& combos, const ComboMap& overrideCombos
-) :
+ShaderUnit::ShaderUnit (const GLSLContext::UnitType type, std::string file, std::string content,
+                        const AssetLocator& assetLocator, const ShaderConstantMap& constants,
+                        const TextureMap& passTextures, const TextureMap& overrideTextures, const ComboMap& combos,
+                        const ComboMap& overrideCombos) :
     m_type (type),
     m_file (std::move (file)),
-    m_content (std::move(content)),
+    m_content (std::move (content)),
     m_combos (combos),
     m_overrideCombos (overrideCombos),
     m_constants (constants),
@@ -98,20 +100,17 @@ void ShaderUnit::preprocessVariables () {
     while ((end = this->m_preprocessed.find ('\n', start)) != std::string::npos) {
         // Extract a line from the string
         std::string line = this->m_preprocessed.substr (start, end - start);
-        const size_t combo = line.find("// [COMBO] ");
-        const size_t uniform = line.find("uniform ");
-        const size_t comment = line.find("// ");
-        const size_t semicolon = line.find(';');
+        const size_t combo = line.find ("// [COMBO] ");
+        const size_t uniform = line.find ("uniform ");
+        const size_t comment = line.find ("// ");
+        const size_t semicolon = line.find (';');
 
         if (combo != std::string::npos) {
-            this->parseComboConfiguration (line.substr(combo + strlen("// [COMBO] ")), 0);
-        } else if (
-            uniform != std::string::npos &&
-            comment != std::string::npos &&
-            semicolon != std::string::npos &&
-            // this check ensures that the comment is after the semicolon (so it's not a commented-out line)
-            // this needs further refining as it's not taking into account block comments
-            semicolon < comment) {
+            this->parseComboConfiguration (line.substr (combo + strlen ("// [COMBO] ")), 0);
+        } else if (uniform != std::string::npos && comment != std::string::npos && semicolon != std::string::npos &&
+                   // this check ensures that the comment is after the semicolon (so it's not a commented-out line)
+                   // this needs further refining as it's not taking into account block comments
+                   semicolon < comment) {
             // uniforms with comments should never have a value assigned, use this fact to detect the required parts
             const size_t last_space = line.find_last_of (' ', semicolon);
 
@@ -137,11 +136,11 @@ void ShaderUnit::preprocessVariables () {
 void ShaderUnit::preprocessIncludes () {
     size_t start = 0, end = 0;
     // prepare the include content
-    while((start = this->m_preprocessed.find("#include", end)) != std::string::npos) {
+    while ((start = this->m_preprocessed.find ("#include", end)) != std::string::npos) {
         // TODO: CHECK FOR ERRORS HERE, MALFORMED INCLUDES WILL NOT BE PROPERLY HANDLED
         const size_t quoteStart = this->m_preprocessed.find_first_of ('"', start) + 1;
-        const size_t quoteEnd = this->m_preprocessed.find_first_of('"', quoteStart);
-        const std::string filename = this->m_preprocessed.substr(quoteStart, quoteEnd - quoteStart);
+        const size_t quoteEnd = this->m_preprocessed.find_first_of ('"', quoteStart);
+        const std::string filename = this->m_preprocessed.substr (quoteStart, quoteEnd - quoteStart);
 
         // some includes might not be present
         // and that should not be treated as an error mainly because these could come from
@@ -175,12 +174,12 @@ void ShaderUnit::preprocessIncludes () {
     end = 0;
 
     // then apply includes in-place
-    while((start = this->m_includes.find("#include", end)) != std::string::npos) {
+    while ((start = this->m_includes.find ("#include", end)) != std::string::npos) {
         const size_t lineEnd = this->m_includes.find_first_of ('\n', start);
         // TODO: CHECK FOR ERRORS HERE, MALFORMED INCLUDES WILL NOT BE PROPERLY HANDLED
         const size_t quoteStart = this->m_includes.find_first_of ('"', start) + 1;
-        const size_t quoteEnd = this->m_includes.find_first_of('"', quoteStart);
-        const std::string filename = this->m_includes.substr(quoteStart, quoteEnd - quoteStart);
+        const size_t quoteEnd = this->m_includes.find_first_of ('"', quoteStart);
+        const std::string filename = this->m_includes.substr (quoteStart, quoteEnd - quoteStart);
 
         // some includes might not be present
         // and that should not be treated as an error mainly because these could come from
@@ -202,7 +201,7 @@ void ShaderUnit::preprocessIncludes () {
         }
 
         // file contents ready, replace things
-        this->m_includes = this->m_includes.replace (start, lineEnd - start,content);
+        this->m_includes = this->m_includes.replace (start, lineEnd - start, content);
 
         // go back to the beginning of the line to properly continue detecting things
         end = start;
@@ -214,7 +213,7 @@ void ShaderUnit::preprocessIncludes () {
 
     // finally, try to place the include contents before the main function
     while ((start = this->m_preprocessed.find (" main", end)) != std::string::npos) {
-        char value = this->m_preprocessed.at(start + 5);
+        char value = this->m_preprocessed.at (start + 5);
 
         end = start + 5;
 
@@ -256,15 +255,16 @@ void ShaderUnit::preprocessIncludes () {
         // place to put the includes in
         std::stack<size_t> ifdefStack;
 
-        // start looking for #if and #endif results and add to the stack so we find the start of the current chain of ifdefs
-        // and use that as point
+        // start looking for #if and #endif results and add to the stack so we find the start of the current chain of
+        // ifdefs and use that as point
 
         // for this we'll use regex
         const std::regex ifdef (R"((#if|#endif))");
         std::smatch match;
         size_t current = 0;
 
-        while (std::regex_search (this->m_preprocessed.cbegin () + current, this->m_preprocessed.cend (), match, ifdef)) {
+        while (
+            std::regex_search (this->m_preprocessed.cbegin () + current, this->m_preprocessed.cend (), match, ifdef)) {
             current += match.position ();
 
             // if it's opening an #ifdef keep track of the start of the block
@@ -276,7 +276,7 @@ void ShaderUnit::preprocessIncludes () {
             }
 
             // go to the next character so the regex doesn't match with the same thing again
-            current ++;
+            current++;
 
             // most likely a syntax error, but we'll ignore it for now...
             if (ifdefStack.empty ()) {
@@ -309,12 +309,12 @@ void ShaderUnit::preprocessIncludes () {
 void ShaderUnit::preprocessRequires () {
     size_t start = 0, end = 0;
     // comment out requires
-    while((start = this->m_preprocessed.find("#require", end)) != std::string::npos) {
+    while ((start = this->m_preprocessed.find ("#require", end)) != std::string::npos) {
         // TODO: CHECK FOR ERRORS HERE
-        const size_t lineEnd = this->m_preprocessed.find_first_of('\n', start);
-        sLog.out("Shader has a require block ", this->m_preprocessed.substr (start, lineEnd - start));
+        const size_t lineEnd = this->m_preprocessed.find_first_of ('\n', start);
+        sLog.out ("Shader has a require block ", this->m_preprocessed.substr (start, lineEnd - start));
         // replace the first two letters with a comment so the filelength doesn't change
-        this->m_preprocessed = this->m_preprocessed.replace(start, 2, "//");
+        this->m_preprocessed = this->m_preprocessed.replace (start, 2, "//");
 
         // go to the end of the line
         end = lineEnd;
@@ -324,7 +324,7 @@ void ShaderUnit::preprocessRequires () {
 void ShaderUnit::parseComboConfiguration (const std::string& content, const int defaultValue) {
     // TODO: SUPPORT REQUIRES SO WE PROPERLY FOLLOW THE REQUIRED CHAIN
     const auto data = JSON::parse (content);
-    const auto combo = data.require <std::string> ("combo", "cannot parse combo information");
+    const auto combo = data.require<std::string> ("combo", "cannot parse combo information");
     // ignore type as it seems to be used only on the editor
     // const auto type = data.find ("type");
     const auto defvalue = data.find ("default");
@@ -355,9 +355,8 @@ void ShaderUnit::parseComboConfiguration (const std::string& content, const int 
     }
 }
 
-void ShaderUnit::parseParameterConfiguration (
-    const std::string& type, const std::string& name, const std::string& content
-) {
+void ShaderUnit::parseParameterConfiguration (const std::string& type, const std::string& name,
+                                              const std::string& content) {
     const auto data = JSON::parse (content);
     const auto material = data.optional ("material");
     const auto defvalue = data.optional ("default");
@@ -378,11 +377,12 @@ void ShaderUnit::parseParameterConfiguration (
     Variables::ShaderVariable* parameter = nullptr;
 
     if (type == "vec4") {
-        parameter = new Variables::ShaderVariableVector4 (VectorBuilder::parse <glm::vec4> (defvalue->get <std::string> ()));
+        parameter =
+            new Variables::ShaderVariableVector4 (VectorBuilder::parse<glm::vec4> (defvalue->get<std::string> ()));
     } else if (type == "vec3") {
-        parameter = new Variables::ShaderVariableVector3 (VectorBuilder::parse <glm::vec3> (*defvalue));
+        parameter = new Variables::ShaderVariableVector3 (VectorBuilder::parse<glm::vec3> (*defvalue));
     } else if (type == "vec2") {
-        parameter = new Variables::ShaderVariableVector2 (VectorBuilder::parse <glm::vec2> (*defvalue));
+        parameter = new Variables::ShaderVariableVector2 (VectorBuilder::parse<glm::vec2> (*defvalue));
     } else if (type == "float") {
         if (defvalue->is_string ()) {
             parameter = new Variables::ShaderVariableFloat (std::stoi (defvalue->get<std::string> ()));
@@ -391,9 +391,9 @@ void ShaderUnit::parseParameterConfiguration (
         }
     } else if (type == "int") {
         if (defvalue->is_string ()) {
-            parameter = new Variables::ShaderVariableInteger (std::stoi(defvalue->get<std::string> ()));
+            parameter = new Variables::ShaderVariableInteger (std::stoi (defvalue->get<std::string> ()));
         } else {
-            parameter = new Variables::ShaderVariableInteger (defvalue->get <int> ());
+            parameter = new Variables::ShaderVariableInteger (defvalue->get<int> ());
         }
     } else if (type == "sampler2D" || type == "sampler2DComparison") {
         // samplers can have special requirements, check what sampler we're working with and create definitions
@@ -413,7 +413,8 @@ void ShaderUnit::parseParameterConfiguration (
         if (combo != data.end ()) {
             // TODO: CLEANUP HOW THIS IS DETERMINED FIRST
             // if the texture exists (and is not null), add to the combo
-            const auto textureSlotUsed = this->m_passTextures.contains (index) || this->m_overrideTextures.contains (index);
+            const auto textureSlotUsed =
+                this->m_passTextures.contains (index) || this->m_overrideTextures.contains (index);
             bool isRequired = false;
             int comboValue = 1;
 
@@ -423,14 +424,15 @@ void ShaderUnit::parseParameterConfiguration (
                 isRequired = true;
             } else if (require != data.end ()) {
                 // this is required based on certain conditions
-                if (requireany != data.end () && requireany->get <bool> ()) {
+                if (requireany != data.end () && requireany->get<bool> ()) {
                     // any of the values set are valid, check for them
                     for (const auto& item : require->items ()) {
                         const std::string& macro = item.key ();
                         const auto it = this->m_combos.find (macro);
 
                         // if any of the values matched, this option is required
-                        if (it == this->m_combos.end () || this->m_overrideCombos.contains (macro) || it->second != item.value ()) {
+                        if (it == this->m_combos.end () || this->m_overrideCombos.contains (macro) ||
+                            it->second != item.value ()) {
                             isRequired = true;
                             break;
                         }
@@ -444,7 +446,8 @@ void ShaderUnit::parseParameterConfiguration (
                         const auto it = this->m_combos.find (macro);
 
                         // these can not exist and that'd be fine, we just care about the values
-                        if ((it != this->m_combos.end () || this->m_overrideCombos.contains (macro)) && it->second == item.value ()) {
+                        if ((it != this->m_combos.end () || this->m_overrideCombos.contains (macro)) &&
+                            it->second == item.value ()) {
                             isRequired = false;
                             break;
                         }
@@ -463,11 +466,13 @@ void ShaderUnit::parseParameterConfiguration (
                         isRequired = false;
                         // otherwise a default value must be used
                     } else if (defvalue->is_string ()) {
-                        comboValue = std::stoi (defvalue->get <std::string> ().c_str ());
-                    } else if (defvalue->is_number()) {
+                        comboValue = std::stoi (defvalue->get<std::string> ().c_str ());
+                    } else if (defvalue->is_number ()) {
                         comboValue = *defvalue;
                     } else {
-                        sLog.exception ("Cannot determine default value for combo ", combo->get <std::string> (), " because it's not specified by the shader and is not given a default value: ", this->m_file);
+                        sLog.exception ("Cannot determine default value for combo ", combo->get<std::string> (),
+                                        " because it's not specified by the shader and is not given a default value: ",
+                                        this->m_file);
                     }
                 }
             }
@@ -519,7 +524,7 @@ const std::string& ShaderUnit::compile () {
         return this->m_final;
     }
 
-    this->m_final = SHADER_HEADER(this->m_file);
+    this->m_final = SHADER_HEADER (this->m_file);
 
     if (this->m_type == GLSLContext::UnitType_Fragment) {
         this->m_final += FRAGMENT_SHADER_DEFINES;
@@ -592,6 +597,7 @@ const std::string& ShaderUnit::compile () {
 const std::vector<Variables::ShaderVariable*>& ShaderUnit::getParameters () const {
     return this->m_parameters;
 }
+
 const TextureMap& ShaderUnit::getTextures () const {
     return this->m_defaultTextures;
 }

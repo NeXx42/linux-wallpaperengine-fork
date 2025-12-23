@@ -20,4 +20,4 @@ class PropertyParser {
     static PropertySharedPtr parseFile (const JSON& it, const std::string& name);
     static PropertySharedPtr parseTextInput (const JSON& it, const std::string& name);
 };
-}
+} // namespace WallpaperEngine::Data::Parsers

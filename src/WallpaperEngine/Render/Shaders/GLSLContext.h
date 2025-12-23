@@ -3,8 +3,8 @@
 #include <memory>
 #include <ostream>
 #include <sstream>
-#include <vector>
 #include <string>
+#include <vector>
 
 namespace WallpaperEngine::Render::Shaders {
 class GLSLContext {
@@ -25,6 +25,6 @@ class GLSLContext {
     [[nodiscard]] static GLSLContext& get ();
 
   private:
-    static std::unique_ptr <GLSLContext> sInstance;
+    static std::unique_ptr<GLSLContext> sInstance;
 };
 } // namespace WallpaperEngine::Render::Shaders

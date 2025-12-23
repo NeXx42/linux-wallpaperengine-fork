@@ -7,8 +7,8 @@
 #include "WallpaperEngine/Data/Model/Effect.h"
 #include "WallpaperEngine/Data/Model/Material.h"
 
-#include "WallpaperEngine/Render/Objects/CImage.h"
 #include "WallpaperEngine/Render/CFBO.h"
+#include "WallpaperEngine/Render/Objects/CImage.h"
 
 #include "WallpaperEngine/Render/Shaders/Variables/ShaderVariable.h"
 #include "WallpaperEngine/Render/Shaders/Variables/ShaderVariableFloat.h"
@@ -32,15 +32,13 @@ extern float g_Daytime;
 const TextureMap DEFAULT_BINDS = {};
 const ImageEffectPassOverride DEFAULT_OVERRIDE = {};
 
-CPass::CPass (
-    CImage& image, std::shared_ptr<const FBOProvider> fboProvider, const MaterialPass& pass,
-    std::optional<std::reference_wrapper<const ImageEffectPassOverride>> override,
-    std::optional<std::reference_wrapper<const TextureMap>> binds,
-    std::optional<std::reference_wrapper<std::string>> target
-) :
+CPass::CPass (CImage& image, std::shared_ptr<const FBOProvider> fboProvider, const MaterialPass& pass,
+              std::optional<std::reference_wrapper<const ImageEffectPassOverride>> override,
+              std::optional<std::reference_wrapper<const TextureMap>> binds,
+              std::optional<std::reference_wrapper<std::string>> target) :
     Helpers::ContextAware (image),
     m_image (image),
-    m_fboProvider (std::move(fboProvider)),
+    m_fboProvider (std::move (fboProvider)),
     m_pass (pass),
     m_binds (binds.has_value () ? binds.value ().get () : DEFAULT_BINDS),
     m_override (override.has_value () ? override.value ().get () : DEFAULT_OVERRIDE),
@@ -49,7 +47,9 @@ CPass::CPass (
     this->setupShaders ();
 }
 
-std::shared_ptr<const TextureProvider> CPass::resolveTexture (std::shared_ptr<const TextureProvider> expected, int index, std::shared_ptr<const TextureProvider> previous) {
+std::shared_ptr<const TextureProvider> CPass::resolveTexture (std::shared_ptr<const TextureProvider> expected,
+                                                              int index,
+                                                              std::shared_ptr<const TextureProvider> previous) {
     if (expected == nullptr) {
         if (const auto it = this->m_fbos.find (index); it != this->m_fbos.end ())
             expected = it->second;
@@ -100,41 +100,27 @@ void CPass::setupRenderFramebuffer () const {
             glEnable (GL_BLEND);
             glBlendFuncSeparate (GL_ONE, GL_ZERO, GL_ONE, GL_ZERO);
             break;
-        default:
-        glDisable (GL_BLEND);
-            break;
+        default: glDisable (GL_BLEND); break;
     }
 
     switch (this->m_pass.depthtest) {
-        case DepthtestMode_Enabled:
-            glEnable (GL_DEPTH_TEST);
-            break;
+        case DepthtestMode_Enabled: glEnable (GL_DEPTH_TEST); break;
         case DepthtestMode_Disabled:
-        default:
-            glDisable (GL_DEPTH_TEST);
-            break;
+        default: glDisable (GL_DEPTH_TEST); break;
     }
 
     switch (this->m_pass.cullmode) {
-        case CullingMode_Normal:
-            glEnable (GL_CULL_FACE);
-            break;
+        case CullingMode_Normal: glEnable (GL_CULL_FACE); break;
 
         case CullingMode_Disable:
-        default:
-            glDisable (GL_CULL_FACE);
-            break;
+        default: glDisable (GL_CULL_FACE); break;
     }
 
     switch (this->m_pass.depthwrite) {
-        case DepthwriteMode_Enabled:
-            glDepthMask (true);
-            break;
+        case DepthwriteMode_Enabled: glDepthMask (true); break;
 
         case DepthwriteMode_Disabled:
-        default:
-            glDepthMask (false);
-            break;
+        default: glDepthMask (false); break;
     }
 }
 
@@ -264,10 +250,10 @@ void CPass::setupRenderAttributes () const {
         glVertexAttribPointer (cur->id, cur->elements, cur->type, GL_FALSE, 0, nullptr);
 
 #if !NDEBUG
-        glObjectLabel (GL_BUFFER, *cur->value, -1,
-                       ("Image " + std::to_string (this->m_image.getId ()) + " Pass " +
-                        this->m_pass.shader + " " + cur->name)
-                           .c_str ());
+        glObjectLabel (
+            GL_BUFFER, *cur->value, -1,
+            ("Image " + std::to_string (this->m_image.getId ()) + " Pass " + this->m_pass.shader + " " + cur->name)
+                .c_str ());
 #endif /* DEBUG */
     }
 }
@@ -313,11 +299,11 @@ const CImage& CPass::getImage () const {
 }
 
 void CPass::setDestination (std::shared_ptr<const CFBO> drawTo) {
-    this->m_drawTo = std::move(drawTo);
+    this->m_drawTo = std::move (drawTo);
 }
 
 void CPass::setInput (std::shared_ptr<const TextureProvider> input) {
-    this->m_input = std::move(input);
+    this->m_input = std::move (input);
 }
 
 void CPass::setModelViewProjectionMatrix (const glm::mat4* projection) {
@@ -422,13 +408,12 @@ void CPass::setupShaders () {
     // TODO: REVIEW THE SHADER TEXTURES HERE, THE ONES PASSED ON TO THE SHADER SHOULD NOT BE IN THE LIST
     // TODO: USED TO BUILD THE TEXTURES LATER
     // use the combos copied from the pass so it includes the texture format
-    this->m_shader = new Render::Shaders::Shader (
-        this->m_image.getAssetLocator (), this->m_pass.shader, this->m_combos, this->m_override.combos,
-        this->m_pass.textures, this->m_override.textures, this->m_override.constants
-    );
+    this->m_shader = new Render::Shaders::Shader (this->m_image.getAssetLocator (), this->m_pass.shader, this->m_combos,
+                                                  this->m_override.combos, this->m_pass.textures,
+                                                  this->m_override.textures, this->m_override.constants);
 
-    const auto [vertex, fragment] = Shaders::GLSLContext::get ().toGlsl (
-        this->m_shader->vertex (), this->m_shader->fragment ());
+    const auto [vertex, fragment] =
+        Shaders::GLSLContext::get ().toGlsl (this->m_shader->vertex (), this->m_shader->fragment ());
 
     // compile the shaders
     const GLuint vertexShaderID = compileShader (vertex.c_str (), GL_VERTEX_SHADER);
@@ -504,7 +489,7 @@ void CPass::setupTextureUniforms () {
         try {
             if (textureName.find ("_rt_") == 0 || textureName.find ("_alias_") == 0) {
                 this->m_textures [index] = this->resolveFBO (textureName);
-            } else if(!textureName.empty ()) {
+            } else if (!textureName.empty ()) {
                 this->m_textures [index] = this->getContext ().resolveTexture (textureName);
             }
         } catch (std::runtime_error& ex) {
@@ -516,7 +501,7 @@ void CPass::setupTextureUniforms () {
         try {
             if (textureName.find ("_rt_") == 0 || textureName.find ("_alias_") == 0) {
                 this->m_textures [index] = this->resolveFBO (textureName);
-            } else if(!textureName.empty ()) {
+            } else if (!textureName.empty ()) {
                 this->m_textures [index] = this->getContext ().resolveTexture (textureName);
             }
         } catch (std::runtime_error& ex) {
@@ -563,7 +548,7 @@ void CPass::setupTextureUniforms () {
         if (bind == "previous") {
             // use nullptr as indication for "previous" texture
             this->m_textures [index] = nullptr;
-        } else if(!bind.empty ()) {
+        } else if (!bind.empty ()) {
             // a normal bind, search for the corresponding FBO and set it
             this->m_textures [index] = this->resolveFBO (bind);
         }

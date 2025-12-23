@@ -1,7 +1,7 @@
 #pragma once
 
-#include <string>
 #include "include/cef_scheme.h"
+#include <string>
 
 namespace WallpaperEngine::Data::Model {
 struct Project;
@@ -17,11 +17,11 @@ class WPSchemeHandlerFactory : public CefSchemeHandlerFactory {
   public:
     explicit WPSchemeHandlerFactory (const Project& project);
 
-    CefRefPtr<CefResourceHandler> Create (
-        CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame,
-        const CefString& scheme_name, CefRefPtr<CefRequest> request) override;
+    CefRefPtr<CefResourceHandler> Create (CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame,
+                                          const CefString& scheme_name, CefRefPtr<CefRequest> request) override;
 
     static std::string generateSchemeName (const std::string& workshopId);
+
   private:
     const Project& m_project;
 

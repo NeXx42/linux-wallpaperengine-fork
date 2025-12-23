@@ -17,7 +17,7 @@ bool icontains (std::string_view haystack, std::string_view needle) {
     if (haystack.empty ())
         return false;
 
-    auto toLower = [](unsigned char c) {
+    auto toLower = [] (unsigned char c) {
         if (c >= 'A' && c <= 'Z')
             return static_cast<unsigned char> (c - 'A' + 'a');
         return c;
@@ -26,8 +26,8 @@ bool icontains (std::string_view haystack, std::string_view needle) {
     for (size_t i = 0; i + needle.size () <= haystack.size (); ++i) {
         bool match = true;
         for (size_t j = 0; j < needle.size (); ++j) {
-            if (toLower (static_cast<unsigned char> (haystack[i + j])) !=
-                toLower (static_cast<unsigned char> (needle[j]))) {
+            if (toLower (static_cast<unsigned char> (haystack [i + j])) !=
+                toLower (static_cast<unsigned char> (needle [j]))) {
                 match = false;
                 break;
             }
@@ -77,12 +77,8 @@ void toplevelHandleState (void* data, struct zwlr_foreign_toplevel_handle_v1*, s
     }
 }
 
-bool isRelevant (
-    const WallpaperEngine::Application::ApplicationContext& ctx,
-    const bool fullscreen,
-    const bool activated,
-    const std::string& appId
-) {
+bool isRelevant (const WallpaperEngine::Application::ApplicationContext& ctx, const bool fullscreen,
+                 const bool activated, const std::string& appId) {
     if (!fullscreen)
         return false;
 
@@ -164,7 +160,8 @@ constexpr struct zwlr_foreign_toplevel_handle_v1_listener toplevelHandleListener
 
 void handleToplevel (void* data, struct zwlr_foreign_toplevel_manager_v1* manager,
                      struct zwlr_foreign_toplevel_handle_v1* handle) {
-    const auto cb = static_cast<WallpaperEngine::Render::Drivers::Detectors::WaylandFullscreenDetectorCallbackData*> (data);
+    const auto cb =
+        static_cast<WallpaperEngine::Render::Drivers::Detectors::WaylandFullscreenDetectorCallbackData*> (data);
     const auto toplevel = new FullscreenState {
         .pending = false,
         .current = false,
@@ -240,14 +237,11 @@ bool WaylandFullScreenDetector::anythingFullscreen () const {
 
 void WaylandFullScreenDetector::reset () {}
 
-
-__attribute__((constructor)) void registerWaylandFullscreenDetector () {
-    sVideoFactories.registerFullscreenDetector(
-        "wayland",
-        [](ApplicationContext& context, VideoDriver& driver) -> std::unique_ptr<FullScreenDetector> {
-            return std::make_unique <WaylandFullScreenDetector> (context);
-        }
-    );
+__attribute__ ((constructor)) void registerWaylandFullscreenDetector () {
+    sVideoFactories.registerFullscreenDetector (
+        "wayland", [] (ApplicationContext& context, VideoDriver& driver) -> std::unique_ptr<FullScreenDetector> {
+            return std::make_unique<WaylandFullScreenDetector> (context);
+        });
 }
 
 } // namespace WallpaperEngine::Render::Drivers::Detectors

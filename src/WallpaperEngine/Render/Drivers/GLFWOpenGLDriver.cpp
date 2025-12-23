@@ -19,9 +19,7 @@ void CustomGLFWErrorHandler (int errorCode, const char* reason) {
     sLog.error ("GLFW error ", errorCode, ": ", reason);
 }
 
-GLFWOpenGLDriver::GLFWOpenGLDriver (
-    const char* windowTitle, ApplicationContext& context, WallpaperApplication& app
-) :
+GLFWOpenGLDriver::GLFWOpenGLDriver (const char* windowTitle, ApplicationContext& context, WallpaperApplication& app) :
     VideoDriver (app, m_mouseInput),
     m_context (context),
     m_mouseInput (*this) {
@@ -144,13 +142,14 @@ void GLFWOpenGLDriver::dispatchEventQueue () {
                            GL_UNSIGNED_BYTE, this->m_output->getImageBufferSize (), this->m_output->getImageBuffer ());
         } else {
             // fallback to old version
-            glReadPixels (0, 0, this->m_output->getFullWidth (), this->m_output->getFullHeight (), GL_BGRA, GL_UNSIGNED_BYTE, this->m_output->getImageBuffer ());
+            glReadPixels (0, 0, this->m_output->getFullWidth (), this->m_output->getFullHeight (), GL_BGRA,
+                          GL_UNSIGNED_BYTE, this->m_output->getImageBuffer ());
         }
 
-        GLenum error = glGetError();
+        GLenum error = glGetError ();
 
         if (error != GL_NO_ERROR) {
-            sLog.exception("OpenGL error when reading texture ", error);
+            sLog.exception ("OpenGL error when reading texture ", error);
         }
     }
 
@@ -180,27 +179,20 @@ GLFWwindow* GLFWOpenGLDriver::getWindow () const {
     return this->m_window;
 }
 
-
-__attribute__((constructor)) void registerGLFWOpenGLDriver () {
+__attribute__ ((constructor)) void registerGLFWOpenGLDriver () {
     sVideoFactories.registerDriver (
-        ApplicationContext::DESKTOP_BACKGROUND,
-        "x11",
-        [](ApplicationContext& context, WallpaperApplication& application) -> std::unique_ptr<VideoDriver> {
-            return std::make_unique <GLFWOpenGLDriver> ("wallpaperengine", context, application);
-        }
-    );
+        ApplicationContext::DESKTOP_BACKGROUND, "x11",
+        [] (ApplicationContext& context, WallpaperApplication& application) -> std::unique_ptr<VideoDriver> {
+            return std::make_unique<GLFWOpenGLDriver> ("wallpaperengine", context, application);
+        });
     sVideoFactories.registerDriver (
-        ApplicationContext::EXPLICIT_WINDOW,
-        DEFAULT_WINDOW_NAME,
-        [](ApplicationContext& context, WallpaperApplication& application) -> std::unique_ptr<VideoDriver> {
-            return std::make_unique <GLFWOpenGLDriver> ("wallpaperengine", context, application);
-        }
-    );
+        ApplicationContext::EXPLICIT_WINDOW, DEFAULT_WINDOW_NAME,
+        [] (ApplicationContext& context, WallpaperApplication& application) -> std::unique_ptr<VideoDriver> {
+            return std::make_unique<GLFWOpenGLDriver> ("wallpaperengine", context, application);
+        });
     sVideoFactories.registerDriver (
-        ApplicationContext::NORMAL_WINDOW,
-        DEFAULT_WINDOW_NAME,
-        [](ApplicationContext& context, WallpaperApplication& application) -> std::unique_ptr<VideoDriver> {
-            return std::make_unique <GLFWOpenGLDriver> ("wallpaperengine", context, application);
-        }
-    );
+        ApplicationContext::NORMAL_WINDOW, DEFAULT_WINDOW_NAME,
+        [] (ApplicationContext& context, WallpaperApplication& application) -> std::unique_ptr<VideoDriver> {
+            return std::make_unique<GLFWOpenGLDriver> ("wallpaperengine", context, application);
+        });
 }

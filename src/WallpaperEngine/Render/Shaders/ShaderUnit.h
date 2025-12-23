@@ -5,8 +5,8 @@
 #include <string>
 
 #include "GLSLContext.h"
-#include "WallpaperEngine/Data/JSON.h"
 #include "WallpaperEngine/Assets/AssetLocator.h"
+#include "WallpaperEngine/Data/JSON.h"
 #include "WallpaperEngine/Render/Shaders/Variables/ShaderVariable.h"
 #include "nlohmann/json.hpp"
 
@@ -22,10 +22,9 @@ using namespace WallpaperEngine::Data::Model;
  */
 class ShaderUnit {
   public:
-    ShaderUnit (
-        const GLSLContext::UnitType type, std::string file, std::string content, const AssetLocator& assetLocator,
-        const ShaderConstantMap& constants, const TextureMap& passTextures,
-        const TextureMap& overrideTextures, const ComboMap& combos, const ComboMap& overrideCombos);
+    ShaderUnit (const GLSLContext::UnitType type, std::string file, std::string content,
+                const AssetLocator& assetLocator, const ShaderConstantMap& constants, const TextureMap& passTextures,
+                const TextureMap& overrideTextures, const ComboMap& combos, const ComboMap& overrideCombos);
     ~ShaderUnit () = default;
 
     /**
@@ -161,4 +160,4 @@ class ShaderUnit {
      */
     const AssetLocator& m_assetLocator;
 };
-}
+} // namespace WallpaperEngine::Render::Shaders

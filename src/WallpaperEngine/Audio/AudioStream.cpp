@@ -100,13 +100,11 @@ int64_t audio_seek_data_callback (void* streamarg, int64_t offset, int whence) {
     return 0;
 }
 
-AudioStream::AudioStream (AudioContext& context, const std::string& filename) :
-    m_audioContext (context) {
+AudioStream::AudioStream (AudioContext& context, const std::string& filename) : m_audioContext (context) {
     this->loadCustomContent (filename.c_str ());
 }
 
-AudioStream::AudioStream (AudioContext& context, const ReadStreamSharedPtr& buffer) :
-    m_audioContext (context) {
+AudioStream::AudioStream (AudioContext& context, const ReadStreamSharedPtr& buffer) : m_audioContext (context) {
     // setup a custom context first
     this->m_formatContext = avformat_alloc_context ();
 
@@ -171,7 +169,8 @@ void AudioStream::loadCustomContent (const char* filename) {
 
     // find the audio stream
     for (unsigned int i = 0; i < this->m_formatContext->nb_streams; i++) {
-        if (this->m_formatContext->streams [i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO && this->m_audioStream == NO_AUDIO_STREAM) {
+        if (this->m_formatContext->streams [i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO &&
+            this->m_audioStream == NO_AUDIO_STREAM) {
             this->m_audioStream = i;
         }
     }
@@ -295,7 +294,7 @@ bool AudioStream::doQueue (AVPacket* pkt) {
     MyAVPacketList entry {pkt};
 
 #if FF_API_FIFO_OLD_API
-    if (av_fifo_space (this->m_queue->packetList) < static_cast <int> (sizeof (entry)))
+    if (av_fifo_space (this->m_queue->packetList) < static_cast<int> (sizeof (entry)))
         if (av_fifo_grow (this->m_queue->packetList, sizeof (entry)) < 0)
             return false;
 
@@ -316,7 +315,7 @@ bool AudioStream::doQueue (AVPacket* pkt) {
 }
 
 void AudioStream::dequeuePacket () {
-    MyAVPacketList entry{};
+    MyAVPacketList entry {};
 
     SDL_LockMutex (this->m_queue->mutex);
 
@@ -324,7 +323,7 @@ void AudioStream::dequeuePacket () {
 #if FF_API_FIFO_OLD_API
         int ret = -1;
 
-        if (av_fifo_size (this->m_queue->packetList) >= static_cast <int> (sizeof (entry)))
+        if (av_fifo_size (this->m_queue->packetList) >= static_cast<int> (sizeof (entry)))
             ret = av_fifo_generic_read (this->m_queue->packetList, &entry, sizeof (entry), nullptr);
 #else
         const int ret = av_fifo_read (this->m_queue->packetList, &entry, 1);
@@ -494,7 +493,7 @@ int AudioStream::resampleAudio (uint8_t* out_buf, const int out_size) {
 
     // do the actual audio data resampling
     ret = swr_convert (this->m_swrctx, resampled_data, max_out_nb_samples,
-    const_cast<const uint8_t**> (this->m_decodeFrame->data), this->m_decodeFrame->nb_samples);
+                       const_cast<const uint8_t**> (this->m_decodeFrame->data), this->m_decodeFrame->nb_samples);
 
     // check audio conversion was successful
     if (ret < 0) {
@@ -513,7 +512,7 @@ int AudioStream::resampleAudio (uint8_t* out_buf, const int out_size) {
     }
 
     // copy the resampled data to the output buffer up to out_size bytes
-    memcpy (out_buf, resampled_data [0], std::min(resampled_data_size, out_size));
+    memcpy (out_buf, resampled_data [0], std::min (resampled_data_size, out_size));
 
     // memory cleanup
     if (resampled_data) {

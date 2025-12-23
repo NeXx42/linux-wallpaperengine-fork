@@ -21,7 +21,7 @@ class BrowserApp : public SubprocessApp, public CefBrowserProcessHandler {
 
     void OnContextInitialized () override;
     void OnBeforeCommandLineProcessing (const CefString& process_type, CefRefPtr<CefCommandLine> command_line) override;
-    void OnBeforeChildProcessLaunch(CefRefPtr<CefCommandLine> command_line) override;
+    void OnBeforeChildProcessLaunch (CefRefPtr<CefCommandLine> command_line) override;
 
   private:
     IMPLEMENT_REFCOUNTING (BrowserApp);

@@ -19,7 +19,7 @@ using namespace WallpaperEngine::FileSystem::Adapters;
  * behind to trust the input data without much validation
  * @see https://en.cppreference.com/w/cpp/filesystem/path/lexically_normal
  */
-std::filesystem::path normalize_path(const std::filesystem::path& input_path) {
+std::filesystem::path normalize_path (const std::filesystem::path& input_path) {
     return input_path.lexically_normal ();
 }
 
@@ -64,8 +64,8 @@ AdapterSharedPtr Container::mount (const std::filesystem::path& path, const std:
         return this->m_mountpoints.emplace_back (mountPoint, factory->create (path)).second;
     }
 
-    throw std::filesystem::filesystem_error (
-        "The specified mount cannot be handled by any of the filesystem adapters", path, std::error_code ());
+    throw std::filesystem::filesystem_error ("The specified mount cannot be handled by any of the filesystem adapters",
+                                             path, std::error_code ());
 }
 
 VirtualAdapter& Container::getVFS () const {
@@ -76,7 +76,7 @@ Adapter& Container::resolveAdapterForFile (const std::filesystem::path& path) co
     const auto normalized = normalize_path (path);
 
     for (const auto& [root, adapter] : this->m_mountpoints) {
-        if (normalized.string().starts_with (root.string()) == false) {
+        if (normalized.string ().starts_with (root.string ()) == false) {
             continue;
         }
 
@@ -88,10 +88,11 @@ Adapter& Container::resolveAdapterForFile (const std::filesystem::path& path) co
         return *adapter;
     }
 
-    if (normalized.string().starts_with ("/") == false) {
+    if (normalized.string ().starts_with ("/") == false) {
         // try resolving as absolute, just in case it's relative to the root
-        return this->resolveAdapterForFile ("/" + normalized.string());
+        return this->resolveAdapterForFile ("/" + normalized.string ());
     }
 
-    throw std::filesystem::filesystem_error ("Cannot find requested file in any of the mountpoints", path, std::error_code ());
+    throw std::filesystem::filesystem_error ("Cannot find requested file in any of the mountpoints", path,
+                                             std::error_code ());
 }

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <vector>
 #include <memory>
+#include <vector>
 
 #include <GL/glew.h>
 #include <glm/vec4.hpp>
@@ -11,6 +11,7 @@
 
 namespace WallpaperEngine::Render {
 using namespace WallpaperEngine::Data::Assets;
+
 /**
  * Base interface that describes the minimum information required for a texture
  * to be displayed by the engine

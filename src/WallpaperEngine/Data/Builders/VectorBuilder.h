@@ -1,9 +1,9 @@
 #pragma once
 
 #include <cstring>
-#include <string>
 #include <glm/detail/qualifier.hpp>
 #include <glm/detail/type_vec1.hpp>
+#include <string>
 
 #include "WallpaperEngine/Data/Utils/SFINAE.h"
 #include "WallpaperEngine/Logging/Log.h"
@@ -20,8 +20,7 @@ class VectorBuilder {
      * @param str
      * @return
      */
-    template <typename type>
-    static type convert (const char* str);
+    template <typename type> static type convert (const char* str);
 
   public:
     /**
@@ -106,29 +105,17 @@ class VectorBuilder {
 
         // lengths validated, values can be used directly without issues
         if constexpr (length == 1) {
-            return {
-                convert <type> (p)
-            };
+            return {convert<type> (p)};
         } else if constexpr (length == 2) {
-            return {
-                convert <type> (p),
-                convert <type> (first + 1)
-            };
+            return {convert<type> (p), convert<type> (first + 1)};
         } else if constexpr (length == 3) {
-            return {
-                convert <type> (p),
-                convert <type> (first + 1),
-                convert <type> (second + 1)
-            };
+            return {convert<type> (p), convert<type> (first + 1), convert<type> (second + 1)};
         } else if constexpr (length == 4) {
-            return {
-                convert <type> (p),
-                convert <type> (first + 1),
-                convert <type> (second + 1),
-                convert <type> (third + 1)
-            };
+            return {convert<type> (p), convert<type> (first + 1), convert<type> (second + 1),
+                    convert<type> (third + 1)};
         }
     }
+
     template <typename T, typename std::enable_if_t<is_glm_vec<T>::value, int> = 0>
     [[nodiscard]] static T parse (const std::string& str) {
         constexpr int length = GlmVecTraits<T>::length;
@@ -139,59 +126,48 @@ class VectorBuilder {
     }
 };
 
-template <>
-inline float VectorBuilder::convert<float> (const char* str) {
+template <> inline float VectorBuilder::convert<float> (const char* str) {
     return std::strtof (str, nullptr);
 }
 
-template <>
-inline int VectorBuilder::convert<int> (const char* str) {
+template <> inline int VectorBuilder::convert<int> (const char* str) {
     return std::stoi (str);
 }
 
-template <>
-inline unsigned int VectorBuilder::convert<unsigned int> (const char* str) {
+template <> inline unsigned int VectorBuilder::convert<unsigned int> (const char* str) {
     return std::strtoul (str, nullptr, 10);
 }
 
-template <>
-inline double VectorBuilder::convert<double> (const char* str) {
+template <> inline double VectorBuilder::convert<double> (const char* str) {
     return std::strtod (str, nullptr);
 }
 
-template <>
-inline uint8_t VectorBuilder::convert<uint8_t> (const char* str) {
+template <> inline uint8_t VectorBuilder::convert<uint8_t> (const char* str) {
     return std::strtoul (str, nullptr, 10);
 }
 
-template <>
-inline uint16_t VectorBuilder::convert<uint16_t> (const char* str) {
+template <> inline uint16_t VectorBuilder::convert<uint16_t> (const char* str) {
     return std::strtoul (str, nullptr, 10);
 }
 
-template <>
-inline uint64_t VectorBuilder::convert<uint64_t> (const char* str) {
+template <> inline uint64_t VectorBuilder::convert<uint64_t> (const char* str) {
     return std::strtoull (str, nullptr, 10);
 }
 
-template <>
-inline int8_t VectorBuilder::convert<int8_t> (const char* str) {
+template <> inline int8_t VectorBuilder::convert<int8_t> (const char* str) {
     return std::strtol (str, nullptr, 10);
 }
 
-template <>
-inline int16_t VectorBuilder::convert<int16_t> (const char* str) {
+template <> inline int16_t VectorBuilder::convert<int16_t> (const char* str) {
     return std::strtol (str, nullptr, 10);
 }
 
-template <>
-inline int64_t VectorBuilder::convert<int64_t> (const char* str) {
+template <> inline int64_t VectorBuilder::convert<int64_t> (const char* str) {
     return std::strtoll (str, nullptr, 10);
 }
 
-template <>
-inline bool VectorBuilder::convert<bool> (const char* str) {
+template <> inline bool VectorBuilder::convert<bool> (const char* str) {
     return std::strtoul (str, nullptr, 10) > 0;
 }
 
-} // namespace WallpaperEngine::Data::Parsers
+} // namespace WallpaperEngine::Data::Builders

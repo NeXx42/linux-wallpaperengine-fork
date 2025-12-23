@@ -1,10 +1,11 @@
 #pragma once
 
-#include <filesystem>
 #include "WallpaperEngine/Data/Utils/BinaryReader.h"
+#include <filesystem>
 
 namespace WallpaperEngine::FileSystem::Adapters {
 using namespace WallpaperEngine::Data::Utils;
+
 struct Adapter {
     Adapter () = default;
     virtual ~Adapter () = default;

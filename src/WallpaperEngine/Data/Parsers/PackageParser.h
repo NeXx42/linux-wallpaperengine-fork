@@ -1,17 +1,18 @@
 #pragma once
 
-#include <iosfwd>
 #include "WallpaperEngine/Data/Assets/Types.h"
 #include "WallpaperEngine/Data/Utils/BinaryReader.h"
+#include <iosfwd>
 
 namespace WallpaperEngine::Data::Parsers {
 using namespace WallpaperEngine::Data::Assets;
 using namespace WallpaperEngine::Data::Utils;
+
 class PackageParser {
-public:
+  public:
     static PackageUniquePtr parse (ReadStreamSharedPtr stream);
 
-private:
+  private:
     static FileEntryList parseFileList (const BinaryReader& stream);
 };
-}
+} // namespace WallpaperEngine::Data::Parsers

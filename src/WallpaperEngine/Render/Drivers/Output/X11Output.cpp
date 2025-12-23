@@ -1,6 +1,6 @@
+#include "X11Output.h"
 #include "GLFWOutputViewport.h"
 #include "WallpaperEngine/Logging/Log.h"
-#include "X11Output.h"
 
 #include <X11/Xatom.h>
 #include <X11/Xlib.h>
@@ -29,7 +29,8 @@ int CustomXIOErrorHandler (Display* dsp) {
     return 0;
 }
 
-X11Output::X11Output (ApplicationContext& context, VideoDriver& driver) : Output (context, driver),
+X11Output::X11Output (ApplicationContext& context, VideoDriver& driver) :
+    Output (context, driver),
     m_display (nullptr),
     m_pixmap (None),
     m_root (None),
@@ -175,7 +176,6 @@ void X11Output::loadScreenInfo () {
 
         sLog.exception ("Cannot continue...");
     }
-
 
     // create pixmap so we can draw things in there
     this->m_pixmap = XCreatePixmap (this->m_display, this->m_root, this->m_fullWidth, this->m_fullHeight, 24);

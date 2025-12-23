@@ -1,9 +1,9 @@
 #include "CImage.h"
 #include <sstream>
 
-#include "WallpaperEngine/Data/Parsers/MaterialParser.h"
-#include "WallpaperEngine/Data/Model/Object.h"
 #include "WallpaperEngine/Data/Model/Material.h"
+#include "WallpaperEngine/Data/Model/Object.h"
+#include "WallpaperEngine/Data/Parsers/MaterialParser.h"
 
 using namespace WallpaperEngine;
 using namespace WallpaperEngine::Render::Objects;
@@ -26,8 +26,8 @@ CImage::CImage (Wallpapers::CScene& scene, const Image& image) :
     m_modelViewProjectionScreenInverse (),
     m_modelViewProjectionPassInverse (glm::inverse (m_modelViewProjectionPass)),
     m_modelViewProjectionCopyInverse (),
-    m_modelMatrix(),
-    m_viewProjectionMatrix(),
+    m_modelMatrix (),
+    m_viewProjectionMatrix (),
     m_image (image),
     m_material (nullptr),
     m_colorBlendMaterial (nullptr),
@@ -59,21 +59,19 @@ CImage::CImage (Wallpapers::CScene& scene, const Image& image) :
             size.x = scene_width;
             size.y = scene_height;
         }
-        // if (this->m_image->isSolid ()) // layer receives cursor events: https://docs.wallpaperengine.io/en/scene/scenescript/reference/event/cursor.html
-        // same applies to effects
+        // if (this->m_image->isSolid ()) // layer receives cursor events:
+        // https://docs.wallpaperengine.io/en/scene/scenescript/reference/event/cursor.html same applies to effects
         // TODO: create a dummy texture of correct size, fbo constructors should be enough, but this should be properly
         // handled
-        this->m_texture = std::make_shared<CFBO> (
-            "", TextureFormat_ARGB8888, TextureFlags_NoFlags, 1, size.x,
-                  size.y, size.x, size.y);
+        this->m_texture = std::make_shared<CFBO> ("", TextureFormat_ARGB8888, TextureFlags_NoFlags, 1, size.x, size.y,
+                                                  size.x, size.y);
     }
 
     // If the wallpaper doesn't specify a size, fall back to the texture or model dimensions
     if ((size.x == 0.0f || size.y == 0.0f) && this->m_texture != nullptr) {
         size.x = static_cast<float> (this->m_texture->getRealWidth ());
         size.y = static_cast<float> (this->m_texture->getRealHeight ());
-    } else if ((size.x == 0.0f || size.y == 0.0f) &&
-               this->getImage ().model->width.has_value () &&
+    } else if ((size.x == 0.0f || size.y == 0.0f) && this->getImage ().model->width.has_value () &&
                this->getImage ().model->height.has_value ()) {
         size.x = static_cast<float> (this->getImage ().model->width.value ());
         size.y = static_cast<float> (this->getImage ().model->height.value ());
@@ -125,12 +123,10 @@ CImage::CImage (Wallpapers::CScene& scene, const Image& image) :
     nameA << "_rt_imageLayerComposite_" << this->getImage ().id << "_a";
     nameB << "_rt_imageLayerComposite_" << this->getImage ().id << "_b";
 
-    this->m_currentMainFBO = this->m_mainFBO =
-        scene.create (nameA.str (), TextureFormat_ARGB8888, this->m_texture->getFlags (), 1,
-                      {size.x, size.y}, {size.x, size.y});
-    this->m_currentSubFBO = this->m_subFBO =
-        scene.create (nameB.str (), TextureFormat_ARGB8888, this->m_texture->getFlags (), 1,
-                      {size.x, size.y}, {size.x, size.y});
+    this->m_currentMainFBO = this->m_mainFBO = scene.create (
+        nameA.str (), TextureFormat_ARGB8888, this->m_texture->getFlags (), 1, {size.x, size.y}, {size.x, size.y});
+    this->m_currentSubFBO = this->m_subFBO = scene.create (
+        nameB.str (), TextureFormat_ARGB8888, this->m_texture->getFlags (), 1, {size.x, size.y}, {size.x, size.y});
 
     // build a list of vertices, these might need some change later (or maybe invert the camera)
     GLfloat sceneSpacePosition [] = {this->m_pos.x, this->m_pos.y, 0.0f, this->m_pos.x, this->m_pos.w, 0.0f,
@@ -238,7 +234,8 @@ void CImage::setup () {
         return;
     }
 
-    // TODO: CHECK ORDER OF THINGS, 2419444134'S ID 27 DEPENDS ON 104'S COMPOSITE_A WHEN OUR LAST RENDER IS ON COMPOSITE_B
+    // TODO: CHECK ORDER OF THINGS, 2419444134'S ID 27 DEPENDS ON 104'S COMPOSITE_A WHEN OUR LAST RENDER IS ON
+    // COMPOSITE_B
     // TODO: SUPPORT PASSTHROUGH (IT'S A SHADER)
     // passthrough images without effects are bad, do not draw them
     if (this->m_image.model->passthrough && this->m_image.effects.empty ()) {
@@ -248,16 +245,15 @@ void CImage::setup () {
     // copy pass to the composite layer
     for (const auto& cur : this->getImage ().model->material->passes) {
         this->m_passes.push_back (
-            new CPass (*this, std::make_shared<FBOProvider> (this), *cur, std::nullopt, std::nullopt, std::nullopt)
-        );
+            new CPass (*this, std::make_shared<FBOProvider> (this), *cur, std::nullopt, std::nullopt, std::nullopt));
     }
 
     // prepare the passes list
     if (!this->getImage ().effects.empty ()) {
         // generate the effects used by this material
         for (const auto& cur : this->m_image.effects) {
-            // do not add non-visible effects, this might need some adjustements tho as some effects might not be visible
-            // but affect the output of the image...
+            // do not add non-visible effects, this might need some adjustements tho as some effects might not be
+            // visible but affect the output of the image...
             if (!cur->visible->value->getBool ()) {
                 continue;
             }
@@ -298,25 +294,21 @@ void CImage::setup () {
                         continue;
                     }
 
-                    auto virtualPass = std::make_unique<MaterialPass>(MaterialPass {
-                        .blending = BlendingMode_Normal,
-                        .cullmode = CullingMode_Disable,
-                        .depthtest = DepthtestMode_Disabled,
-                        .depthwrite = DepthwriteMode_Disabled,
-                        .shader = "commands/copy",
-                        .textures = {
-                            {0, *(*curEffect)->source}
-                        },
-                        .combos = {},
-                        .constants = {}
-                    });
+                    auto virtualPass =
+                        std::make_unique<MaterialPass> (MaterialPass {.blending = BlendingMode_Normal,
+                                                                      .cullmode = CullingMode_Disable,
+                                                                      .depthtest = DepthtestMode_Disabled,
+                                                                      .depthwrite = DepthwriteMode_Disabled,
+                                                                      .shader = "commands/copy",
+                                                                      .textures = {{0, *(*curEffect)->source}},
+                                                                      .combos = {},
+                                                                      .constants = {}});
 
-                    const auto& config = *this->m_virtualPassess.emplace_back (std::move(virtualPass));
+                    const auto& config = *this->m_virtualPassess.emplace_back (std::move (virtualPass));
 
                     // build a pass for a copy shader
-                    this->m_passes.push_back (
-                        new CPass (*this, fboProvider, config, std::nullopt, std::nullopt, (*curEffect)->target.value ())
-                    );
+                    this->m_passes.push_back (new CPass (*this, fboProvider, config, std::nullopt, std::nullopt,
+                                                         (*curEffect)->target.value ()));
                 } else {
                     for (auto& pass : (*curEffect)->material.value ()->passes) {
                         const auto override =
@@ -341,26 +333,21 @@ void CImage::setup () {
 
     // extra render pass if there's any blending to be done
     if (this->m_image.colorBlendMode > 0) {
-        this->m_materials.colorBlending.material = MaterialParser::load (this->getScene ().getScene ().project, "materials/util/effectpassthrough.json");
+        this->m_materials.colorBlending.material =
+            MaterialParser::load (this->getScene ().getScene ().project, "materials/util/effectpassthrough.json");
         this->m_materials.colorBlending.override = std::make_unique<ImageEffectPassOverride> (ImageEffectPassOverride {
             .id = -1,
-            .combos = {
-                {"BLENDMODE", this->m_image.colorBlendMode},
-            },
+            .combos =
+                {
+                    {"BLENDMODE", this->m_image.colorBlendMode},
+                },
             .constants = {},
             .textures = {},
         });
 
-        this->m_passes.push_back (
-            new CPass (
-                *this,
-                std::make_shared <FBOProvider>(this),
-                **this->m_materials.colorBlending.material->passes.begin (),
-                *this->m_materials.colorBlending.override,
-                std::nullopt,
-                std::nullopt
-            )
-        );
+        this->m_passes.push_back (new CPass (*this, std::make_shared<FBOProvider> (this),
+                                             **this->m_materials.colorBlending.material->passes.begin (),
+                                             *this->m_materials.colorBlending.override, std::nullopt, std::nullopt));
     }
 
     // if there's more than one pass the blendmode has to be moved from the beginning to the end
@@ -518,9 +505,7 @@ void CImage::updateScreenSpacePosition () {
     float y = (depth.y + parallaxAmount) * displacement->y * this->getSize ().x;
 
     this->m_modelViewProjectionScreen = glm::translate (
-        this->getScene ().getCamera ().getProjection () * this->getScene ().getCamera ().getLookAt (),
-        {x, y, 0.0f}
-    );
+        this->getScene ().getCamera ().getProjection () * this->getScene ().getCamera ().getLookAt (), {x, y, 0.0f});
 }
 
 std::shared_ptr<const TextureProvider> CImage::getTexture () const {

@@ -29,9 +29,8 @@ class PulseAudioPlaybackRecorder;
  */
 class AudioDriver {
   public:
-    explicit AudioDriver (
-        Application::ApplicationContext& applicationContext, Detectors::AudioPlayingDetector& detector,
-        Recorders::PlaybackRecorder& recorder);
+    explicit AudioDriver (Application::ApplicationContext& applicationContext,
+                          Detectors::AudioPlayingDetector& detector, Recorders::PlaybackRecorder& recorder);
 
     virtual ~AudioDriver () = default;
     /**

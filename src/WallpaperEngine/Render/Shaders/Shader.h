@@ -7,8 +7,8 @@
 #include "../TextureProvider.h"
 #include "WallpaperEngine/Render/Shaders/Variables/ShaderVariable.h"
 
-#include "ShaderUnit.h"
 #include "GLSLContext.h"
+#include "ShaderUnit.h"
 
 #include "WallpaperEngine/Data/Model/Types.h"
 
@@ -26,6 +26,7 @@ class Shader {
         Variables::ShaderVariable* vertex;
         Variables::ShaderVariable* fragment;
     };
+
     /**
      * Compiler constructor, loads the given shader file and prepares
      * the pre-processing and compilation of the shader, adding
@@ -39,11 +40,9 @@ class Shader {
      * @param overrideTextures List of override textures to use
      * @param constants Default values for shader variables
      */
-    Shader (
-        const AssetLocator& assetLocator, std::string filename,
-        const ComboMap& combos, const ComboMap& overrideCombos,
-        const TextureMap& textures, const TextureMap& overrideTextures,
-        const ShaderConstantMap& constants);
+    Shader (const AssetLocator& assetLocator, std::string filename, const ComboMap& combos,
+            const ComboMap& overrideCombos, const TextureMap& textures, const TextureMap& overrideTextures,
+            const ShaderConstantMap& constants);
     /**
      * @return The vertex's shader coude for OpenGL to use
      */

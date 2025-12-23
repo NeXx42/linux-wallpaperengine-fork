@@ -19,20 +19,20 @@ void initLogging () {
     sLog.addError (new std::ostream (std::cerr.rdbuf ()));
 }
 
-int main (int argc, char* argv[]) {
+int main (int argc, char* argv []) {
     try {
         // if type parameter is specified, this is a subprocess, so no logging should be enabled from our side
         bool enableLogging = true;
         const std::string typeZygote = "--type=zygote";
         const std::string typeUtility = "--type=utility";
 
-        for (int i = 1; i < argc; i ++) {
-            if (strncmp (typeZygote.c_str(), argv[i], typeZygote.size()) == 0) {
+        for (int i = 1; i < argc; i++) {
+            if (strncmp (typeZygote.c_str (), argv [i], typeZygote.size ()) == 0) {
                 enableLogging = false;
                 break;
             }
 
-            if (strncmp (typeUtility.c_str(), argv[i], typeUtility.size()) == 0) {
+            if (strncmp (typeUtility.c_str (), argv [i], typeUtility.size ()) == 0) {
                 enableLogging = false;
                 break;
             }

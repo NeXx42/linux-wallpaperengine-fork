@@ -1,9 +1,8 @@
 #include "AudioPlayingDetector.h"
 
 namespace WallpaperEngine::Audio::Drivers::Detectors {
-AudioPlayingDetector::AudioPlayingDetector (
-    Application::ApplicationContext& appContext,
-    const Render::Drivers::Detectors::FullScreenDetector& fullscreenDetector) :
+AudioPlayingDetector::AudioPlayingDetector (Application::ApplicationContext& appContext,
+                                            const Render::Drivers::Detectors::FullScreenDetector& fullscreenDetector) :
     m_applicationContext (appContext),
     m_fullscreenDetector (fullscreenDetector) {}
 

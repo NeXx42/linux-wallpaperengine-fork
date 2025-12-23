@@ -387,12 +387,10 @@ Output::WaylandOutputViewport* WaylandOpenGLDriver::surfaceToViewport (const wl_
     return nullptr;
 }
 
-__attribute__((constructor)) void registerWaylandOpenGL () {
+__attribute__ ((constructor)) void registerWaylandOpenGL () {
     sVideoFactories.registerDriver (
-        ApplicationContext::DESKTOP_BACKGROUND,
-        "wayland",
-        [](ApplicationContext& context, WallpaperApplication& application) -> std::unique_ptr<VideoDriver> {
-            return std::make_unique <WaylandOpenGLDriver> (context, application);
-        }
-    );
+        ApplicationContext::DESKTOP_BACKGROUND, "wayland",
+        [] (ApplicationContext& context, WallpaperApplication& application) -> std::unique_ptr<VideoDriver> {
+            return std::make_unique<WaylandOpenGLDriver> (context, application);
+        });
 }

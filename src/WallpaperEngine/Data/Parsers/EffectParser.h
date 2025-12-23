@@ -13,9 +13,9 @@ class EffectParser {
 
   private:
     static EffectUniquePtr parse (const JSON& it, const Project& project);
-    static std::vector <std::string> parseDependencies (const JSON& it);
-    static std::vector <EffectPassUniquePtr> parseEffectPasses (const JSON& it, const Project& project);
-    static std::map <int, std::string> parseBinds (const JSON& it);
-    static std::vector <FBOUniquePtr> parseFBOs (const JSON& it);
+    static std::vector<std::string> parseDependencies (const JSON& it);
+    static std::vector<EffectPassUniquePtr> parseEffectPasses (const JSON& it, const Project& project);
+    static std::map<int, std::string> parseBinds (const JSON& it);
+    static std::vector<FBOUniquePtr> parseFBOs (const JSON& it);
 };
 } // namespace WallpaperEngine::Data::Parsers

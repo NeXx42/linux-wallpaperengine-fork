@@ -54,12 +54,14 @@ void pa_stream_read_cb (pa_stream* stream, const size_t /*nbytes*/, void* userda
             if (const size_t numberOfFullBuffers = (currentSize - dataToCopy) / WAVE_BUFFER_SIZE;
                 numberOfFullBuffers > 0) {
                 // calculate the start of the last block (we need the end of the previous block, hence the - 1)
-                const size_t startOfLastBuffer = std::max(dataToCopy + (numberOfFullBuffers - 1) * WAVE_BUFFER_SIZE, currentSize - WAVE_BUFFER_SIZE);
+                const size_t startOfLastBuffer = std::max (dataToCopy + (numberOfFullBuffers - 1) * WAVE_BUFFER_SIZE,
+                                                           currentSize - WAVE_BUFFER_SIZE);
                 // copy directly into the final buffer
                 memcpy (recorder->audioBuffer, &data [startOfLastBuffer], WAVE_BUFFER_SIZE * sizeof (uint8_t));
                 // copy whatever is left to the read/write buffer
                 recorder->currentWritePointer = currentSize - startOfLastBuffer - WAVE_BUFFER_SIZE;
-                memcpy (recorder->audioBufferTmp, &data [startOfLastBuffer + WAVE_BUFFER_SIZE], recorder->currentWritePointer * sizeof (uint8_t));
+                memcpy (recorder->audioBufferTmp, &data [startOfLastBuffer + WAVE_BUFFER_SIZE],
+                        recorder->currentWritePointer * sizeof (uint8_t));
             } else {
                 // okay, no full extra packets available, copy the rest of the data and flip the buffers
                 memcpy (&recorder->audioBufferTmp [recorder->currentWritePointer], data, dataToCopy * sizeof (uint8_t));
@@ -112,7 +114,8 @@ void pa_server_info_cb (pa_context* ctx, const pa_server_info* info, void* userd
     attr.fragsize = bytesPerSec * 10 / 100;
     attr.maxlength = attr.fragsize + bytesPerSec * 750 / 100;
 
-    if (pa_stream_connect_record (recorder->captureStream, monitor_name.c_str (), &attr, PA_STREAM_ADJUST_LATENCY) != 0) {
+    if (pa_stream_connect_record (recorder->captureStream, monitor_name.c_str (), &attr, PA_STREAM_ADJUST_LATENCY) !=
+        0) {
         sLog.error ("Failed to connect to input for recording");
     }
 }
@@ -143,17 +146,14 @@ void pa_context_notify_cb (pa_context* ctx, void* userdata) {
         case PA_CONTEXT_FAILED:
             sLog.error ("PulseAudio context initialization failed. Audio processing is disabled");
             break;
-        default:
-            break;
+        default: break;
     }
 }
 
 PulseAudioPlaybackRecorder::PulseAudioPlaybackRecorder () :
-    m_captureData({
-        .kisscfg = kiss_fftr_alloc (WAVE_BUFFER_SIZE, 0, nullptr, nullptr),
-        .audioBuffer = new uint8_t [WAVE_BUFFER_SIZE],
-        .audioBufferTmp = new uint8_t [WAVE_BUFFER_SIZE]
-    }) {
+    m_captureData ({.kisscfg = kiss_fftr_alloc (WAVE_BUFFER_SIZE, 0, nullptr, nullptr),
+                    .audioBuffer = new uint8_t [WAVE_BUFFER_SIZE],
+                    .audioBufferTmp = new uint8_t [WAVE_BUFFER_SIZE]}) {
     this->m_mainloop = pa_mainloop_new ();
     this->m_mainloopApi = pa_mainloop_get_api (this->m_mainloop);
     this->m_context = pa_context_new (this->m_mainloopApi, "wallpaperengine-audioprocessing");
@@ -203,8 +203,8 @@ void PulseAudioPlaybackRecorder::update () {
     this->m_captureData.fullFrameReady = false;
 
     // convert audio data to deltas so the fft library can properly handle it
-    for (int i = 0; i < WAVE_BUFFER_SIZE; i ++) {
-        this->m_audioFFTbuffer [i] = (this->m_captureData.audioBuffer[i] - 128) / 128.0f;
+    for (int i = 0; i < WAVE_BUFFER_SIZE; i++) {
+        this->m_audioFFTbuffer [i] = (this->m_captureData.audioBuffer [i] - 128) / 128.0f;
     }
 
     // perform full fft pass
@@ -212,10 +212,10 @@ void PulseAudioPlaybackRecorder::update () {
 
     // now reduce to the different bands
     // use just one for loop to produce all 3
-    for (int band = 0; band < 64; band ++) {
+    for (int band = 0; band < 64; band++) {
         int index = band * 2;
-        float f1 = this->m_FFTinfo[index].r;
-        float f2 = this->m_FFTinfo[index].i;
+        float f1 = this->m_FFTinfo [index].r;
+        float f2 = this->m_FFTinfo [index].i;
         f2 = f1 * f1 + f2 * f2; // magnitude
         f1 = 0.0f;
 
@@ -223,9 +223,12 @@ void PulseAudioPlaybackRecorder::update () {
             f1 = 0.35f * log10 (f2);
         }
 
-        this->m_FFTdestination64 [band] = fmin (1.0f, f1 * static_cast<float> (2.0f - pow (M_E, (1.0f - band / 63.0f) * 1.0f - 0.5f)));
-        this->m_FFTdestination32 [band >> 1] = fmin (1.0f, f1 * static_cast<float> (2.0f - pow (M_E, (1.0f - band / 31.0f) * 1.0f - 0.5f)));
-        this->m_FFTdestination16 [band >> 2] = fmin (1.0f, f1 * static_cast<float> (2.0f - pow (M_E, (1.0f - band / 15.0f) * 1.0f - 0.5f)));
+        this->m_FFTdestination64 [band] =
+            fmin (1.0f, f1 * static_cast<float> (2.0f - pow (M_E, (1.0f - band / 63.0f) * 1.0f - 0.5f)));
+        this->m_FFTdestination32 [band >> 1] =
+            fmin (1.0f, f1 * static_cast<float> (2.0f - pow (M_E, (1.0f - band / 31.0f) * 1.0f - 0.5f)));
+        this->m_FFTdestination16 [band >> 2] =
+            fmin (1.0f, f1 * static_cast<float> (2.0f - pow (M_E, (1.0f - band / 15.0f) * 1.0f - 0.5f)));
     }
 }
 

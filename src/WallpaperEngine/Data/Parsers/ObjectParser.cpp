@@ -1,7 +1,7 @@
 #include "ObjectParser.h"
-#include "ModelParser.h"
-#include "MaterialParser.h"
 #include "EffectParser.h"
+#include "MaterialParser.h"
+#include "ModelParser.h"
 
 #include "ShaderConstantParser.h"
 #include "WallpaperEngine/Data/Model/Object.h"
@@ -26,8 +26,8 @@ ObjectUniquePtr ObjectParser::parse (const JSON& it, const Project& project) {
     ObjectData basedata;
     try {
         basedata = ObjectData {
-            .id = it.require <int> ("id", "Object must have an id"),
-            .name = it.require <std::string> ("name", "Object must have a name"),
+            .id = it.require<int> ("id", "Object must have an id"),
+            .name = it.require<std::string> ("name", "Object must have a name"),
             .dependencies = parseDependencies (it),
         };
     } catch (const std::exception& e) {
@@ -43,7 +43,7 @@ ObjectUniquePtr ObjectParser::parse (const JSON& it, const Project& project) {
                 name = std::to_string (nameIt->get<int> ());
             }
         }
-        basedata = ObjectData { .id = id, .name = name, .dependencies = {} };
+        basedata = ObjectData {.id = id, .name = name, .dependencies = {}};
     }
 
     if (imageIt != it.end () && imageIt->is_string ()) {
@@ -61,7 +61,7 @@ ObjectUniquePtr ObjectParser::parse (const JSON& it, const Project& project) {
         sLog.error ("Unknown object type found: ", it.dump ());
     }
 
-    return std::make_unique <Object> (basedata);
+    return std::make_unique<Object> (basedata);
 }
 
 std::vector<int> ObjectParser::parseDependencies (const JSON& it) {
@@ -88,21 +88,19 @@ SoundUniquePtr ObjectParser::parseSound (const JSON& it, ObjectData base) {
         sounds.push_back (cur);
     }
 
-    return std::make_unique <Sound> (
-        std::move (base),
-        SoundData {
-            .playbackmode = it.optional <std::string> ("playbackmode"),
-            .sounds = sounds,
-        }
-    );
+    return std::make_unique<Sound> (std::move (base), SoundData {
+                                                          .playbackmode = it.optional<std::string> ("playbackmode"),
+                                                          .sounds = sounds,
+                                                      });
 }
 
-ImageUniquePtr ObjectParser::parseImage (const JSON& it, const Project& project, ObjectData base, const std::string& image) {
+ImageUniquePtr ObjectParser::parseImage (const JSON& it, const Project& project, ObjectData base,
+                                         const std::string& image) {
     const auto& properties = project.properties;
     const auto& effects = it.optional ("effects");
     const auto& animationLayers = it.optional ("animationlayers");
 
-    auto result = std::make_unique <Image> (
+    auto result = std::make_unique<Image> (
         std::move (base),
         ImageData {
             .origin = it.user ("origin", properties, glm::vec3 (0.0f)),
@@ -117,10 +115,10 @@ ImageUniquePtr ObjectParser::parseImage (const JSON& it, const Project& project,
             .colorBlendMode = it.optional ("colorBlendMode", 0),
             .brightness = it.optional ("brightness", 1.0f),
             .model = ModelParser::load (project, image),
-            .effects = effects.has_value () ? parseEffects (*effects, project) : std::vector <ImageEffectUniquePtr> {},
-            .animationLayers = animationLayers.has_value () ? parseAnimationLayers (*animationLayers) : std::vector <ImageAnimationLayerUniquePtr> {},
-        }
-    );
+            .effects = effects.has_value () ? parseEffects (*effects, project) : std::vector<ImageEffectUniquePtr> {},
+            .animationLayers = animationLayers.has_value () ? parseAnimationLayers (*animationLayers)
+                                                            : std::vector<ImageAnimationLayerUniquePtr> {},
+        });
 
     // color should be a vec4 for alpha, but it's read as vec3
     if (result->color->value->getType () == DynamicValue::UnderlyingType::Vec3) {
@@ -132,15 +130,15 @@ ImageUniquePtr ObjectParser::parseImage (const JSON& it, const Project& project,
     return result;
 }
 
-std::vector <ImageEffectUniquePtr> ObjectParser::parseEffects (const JSON& it, const Project& project) {
+std::vector<ImageEffectUniquePtr> ObjectParser::parseEffects (const JSON& it, const Project& project) {
     if (!it.is_array ()) {
         return {};
     }
 
-    std::vector <ImageEffectUniquePtr> result = {};
+    std::vector<ImageEffectUniquePtr> result = {};
 
     for (const auto& cur : it) {
-       result.push_back (parseEffect (cur, project));
+        result.push_back (parseEffect (cur, project));
     }
 
     return result;
@@ -148,21 +146,22 @@ std::vector <ImageEffectUniquePtr> ObjectParser::parseEffects (const JSON& it, c
 
 ImageEffectUniquePtr ObjectParser::parseEffect (const JSON& it, const Project& project) {
     const auto& passsOverrides = it.optional ("passes");
-    return std::make_unique <ImageEffect> (ImageEffect {
-        .id = it.optional <int> ("id", -1),
-        .name = it.optional <std::string> ("name", "Effect without name"),
+    return std::make_unique<ImageEffect> (ImageEffect {
+        .id = it.optional<int> ("id", -1),
+        .name = it.optional<std::string> ("name", "Effect without name"),
         .visible = it.user ("visible", project.properties, true),
-        .passOverrides = passsOverrides.has_value () ? parseEffectPassOverrides (passsOverrides.value (), project) : std::vector <ImageEffectPassOverrideUniquePtr> {},
-        .effect = EffectParser::load (project, it.require ("file", "Image effect must have an effect"))
-    });
+        .passOverrides = passsOverrides.has_value () ? parseEffectPassOverrides (passsOverrides.value (), project)
+                                                     : std::vector<ImageEffectPassOverrideUniquePtr> {},
+        .effect = EffectParser::load (project, it.require ("file", "Image effect must have an effect"))});
 }
 
-std::vector <ImageEffectPassOverrideUniquePtr> ObjectParser::parseEffectPassOverrides (const JSON& it, const Project& project) {
+std::vector<ImageEffectPassOverrideUniquePtr> ObjectParser::parseEffectPassOverrides (const JSON& it,
+                                                                                      const Project& project) {
     if (!it.is_array ()) {
         return {};
     }
 
-    std::vector <ImageEffectPassOverrideUniquePtr> result = {};
+    std::vector<ImageEffectPassOverrideUniquePtr> result = {};
 
     for (const auto& cur : it) {
         result.push_back (parseEffectPass (cur, project));
@@ -177,10 +176,11 @@ ImageEffectPassOverrideUniquePtr ObjectParser::parseEffectPass (const JSON& it, 
     const auto& constants = it.optional ("constantshadervalues");
 
     // TODO: PARSE CONSTANT SHADER VALUES AND FIND REFS?
-    return std::make_unique <ImageEffectPassOverride> (ImageEffectPassOverride {
-        .id = it.optional <int> ("id", -1),
+    return std::make_unique<ImageEffectPassOverride> (ImageEffectPassOverride {
+        .id = it.optional<int> ("id", -1),
         .combos = combos.has_value () ? parseComboMap (combos.value ()) : ComboMap {},
-        .constants = constants.has_value () ? ShaderConstantParser::parse (constants.value (), project) : ShaderConstantMap {},
+        .constants =
+            constants.has_value () ? ShaderConstantParser::parse (constants.value (), project) : ShaderConstantMap {},
         .textures = textures.has_value () ? parseTextureMap (textures.value ()) : TextureMap {},
     });
 }
@@ -194,7 +194,7 @@ TextureMap ObjectParser::parseTextureMap (const JSON& it) {
     int textureIndex = -1;
 
     for (const auto& cur : it) {
-        textureIndex ++;
+        textureIndex++;
 
         if (cur.is_null ()) {
             result.emplace (textureIndex, "");
@@ -220,12 +220,12 @@ ComboMap ObjectParser::parseComboMap (const JSON& it) {
     return result;
 }
 
-std::vector <ImageAnimationLayerUniquePtr> ObjectParser::parseAnimationLayers (const JSON& it) {
+std::vector<ImageAnimationLayerUniquePtr> ObjectParser::parseAnimationLayers (const JSON& it) {
     if (!it.is_array ()) {
         return {};
     }
 
-    std::vector <ImageAnimationLayerUniquePtr> result = {};
+    std::vector<ImageAnimationLayerUniquePtr> result = {};
 
     for (const auto& cur : it.items ()) {
         result.push_back (parseAnimationLayer (cur.value ()));
@@ -235,7 +235,7 @@ std::vector <ImageAnimationLayerUniquePtr> ObjectParser::parseAnimationLayers (c
 }
 
 ImageAnimationLayerUniquePtr ObjectParser::parseAnimationLayer (const JSON& it) {
-    return std::make_unique <ImageAnimationLayer> (ImageAnimationLayer {
+    return std::make_unique<ImageAnimationLayer> (ImageAnimationLayer {
         .id = it.require ("id", "Animation layer must have an id"),
         .rate = it.require ("rate", "Animation layer must have a rate"),
         .visible = it.require ("visible", "Animation layer must include visibility"),
@@ -246,272 +246,271 @@ ImageAnimationLayerUniquePtr ObjectParser::parseAnimationLayer (const JSON& it) 
 
 ParticleUniquePtr ObjectParser::parseParticle (const JSON& it, const Project& project, ObjectData base) {
     try {
-    const auto& properties = project.properties;
-    const auto particleIt = it.find ("particle");
+        const auto& properties = project.properties;
+        const auto particleIt = it.find ("particle");
 
-    if (particleIt == it.end ()) {
-        sLog.error ("Particle object must have a particle definition");
-        return std::make_unique <Particle> (
-            std::move (base),
-            ParticleData {
-                .origin = it.user ("origin", properties, glm::vec3 (0.0f)),
-                .scale = it.user ("scale", properties, glm::vec3 (1.0f)),
-                .angles = it.user ("angles", properties, glm::vec3 (0.0f)),
-                .visible = it.user ("visible", properties, true),
-                .parallaxDepth = it.optional ("parallaxDepth", glm::vec2 (0.0f)),
-                .particleFile = "",
-                .animationMode = "sequence",
-                .sequenceMultiplier = 1.0f,
-                .maxCount = 100,
-                .startTime = 0,
-                .flags = 0,
-                .material = nullptr,
-                .emitters = {},
-                .initializers = {},
-                .operators = {},
-                .renderers = {},
-                .controlPoints = {},
-                .children = {},
-                .instanceOverride = {
-                    .enabled = std::make_unique<UserSetting> (UserSetting {.value = std::make_unique<DynamicValue> (false), .property = nullptr, .condition = std::nullopt}),
-                    .alpha = std::make_unique<UserSetting> (UserSetting {.value = std::make_unique<DynamicValue> (1.0f), .property = nullptr, .condition = std::nullopt}),
-                    .size = std::make_unique<UserSetting> (UserSetting {.value = std::make_unique<DynamicValue> (1.0f), .property = nullptr, .condition = std::nullopt}),
-                    .lifetime = std::make_unique<UserSetting> (UserSetting {.value = std::make_unique<DynamicValue> (1.0f), .property = nullptr, .condition = std::nullopt}),
-                    .rate = std::make_unique<UserSetting> (UserSetting {.value = std::make_unique<DynamicValue> (1.0f), .property = nullptr, .condition = std::nullopt}),
-                    .speed = std::make_unique<UserSetting> (UserSetting {.value = std::make_unique<DynamicValue> (1.0f), .property = nullptr, .condition = std::nullopt}),
-                    .count = std::make_unique<UserSetting> (UserSetting {.value = std::make_unique<DynamicValue> (1.0f), .property = nullptr, .condition = std::nullopt}),
-                    .color = std::make_unique<UserSetting> (UserSetting {.value = std::make_unique<DynamicValue> (glm::vec3 (1.0f)), .property = nullptr, .condition = std::nullopt}),
-                    .colorn = std::make_unique<UserSetting> (UserSetting {.value = std::make_unique<DynamicValue> (glm::vec3 (1.0f)), .property = nullptr, .condition = std::nullopt})
-                },
+        if (particleIt == it.end ()) {
+            sLog.error ("Particle object must have a particle definition");
+            return std::make_unique<Particle> (
+                std::move (base),
+                ParticleData {
+                    .origin = it.user ("origin", properties, glm::vec3 (0.0f)),
+                    .scale = it.user ("scale", properties, glm::vec3 (1.0f)),
+                    .angles = it.user ("angles", properties, glm::vec3 (0.0f)),
+                    .visible = it.user ("visible", properties, true),
+                    .parallaxDepth = it.optional ("parallaxDepth", glm::vec2 (0.0f)),
+                    .particleFile = "",
+                    .animationMode = "sequence",
+                    .sequenceMultiplier = 1.0f,
+                    .maxCount = 100,
+                    .startTime = 0,
+                    .flags = 0,
+                    .material = nullptr,
+                    .emitters = {},
+                    .initializers = {},
+                    .operators = {},
+                    .renderers = {},
+                    .controlPoints = {},
+                    .children = {},
+                    .instanceOverride = {.enabled = std::make_unique<UserSetting> (
+                                             UserSetting {.value = std::make_unique<DynamicValue> (false),
+                                                          .property = nullptr,
+                                                          .condition = std::nullopt}),
+                                         .alpha = std::make_unique<UserSetting> (
+                                             UserSetting {.value = std::make_unique<DynamicValue> (1.0f),
+                                                          .property = nullptr,
+                                                          .condition = std::nullopt}),
+                                         .size = std::make_unique<UserSetting> (
+                                             UserSetting {.value = std::make_unique<DynamicValue> (1.0f),
+                                                          .property = nullptr,
+                                                          .condition = std::nullopt}),
+                                         .lifetime = std::make_unique<UserSetting> (
+                                             UserSetting {.value = std::make_unique<DynamicValue> (1.0f),
+                                                          .property = nullptr,
+                                                          .condition = std::nullopt}),
+                                         .rate = std::make_unique<UserSetting> (
+                                             UserSetting {.value = std::make_unique<DynamicValue> (1.0f),
+                                                          .property = nullptr,
+                                                          .condition = std::nullopt}),
+                                         .speed = std::make_unique<UserSetting> (
+                                             UserSetting {.value = std::make_unique<DynamicValue> (1.0f),
+                                                          .property = nullptr,
+                                                          .condition = std::nullopt}),
+                                         .count = std::make_unique<UserSetting> (
+                                             UserSetting {.value = std::make_unique<DynamicValue> (1.0f),
+                                                          .property = nullptr,
+                                                          .condition = std::nullopt}),
+                                         .color = std::make_unique<UserSetting> (
+                                             UserSetting {.value = std::make_unique<DynamicValue> (glm::vec3 (1.0f)),
+                                                          .property = nullptr,
+                                                          .condition = std::nullopt}),
+                                         .colorn = std::make_unique<UserSetting> (
+                                             UserSetting {.value = std::make_unique<DynamicValue> (glm::vec3 (1.0f)),
+                                                          .property = nullptr,
+                                                          .condition = std::nullopt})},
+                });
+        }
+
+        std::string particleFile;
+        if (particleIt->is_string ()) {
+            particleFile = particleIt->get<std::string> ();
+        }
+
+        // Load particle definition from file if it's a string reference
+        JSON particleJson = JSON::object ();
+        if (!particleFile.empty ()) {
+            try {
+                particleJson =
+                    WallpaperEngine::Data::JSON::JSON::parse (project.assetLocator->readString (particleFile));
+            } catch (std::runtime_error& e) {
+                sLog.error ("Cannot load particle file: ", particleFile, " - ", e.what ());
             }
-        );
-    }
-
-    std::string particleFile;
-    if (particleIt->is_string ()) {
-        particleFile = particleIt->get<std::string> ();
-    }
-
-    // Load particle definition from file if it's a string reference
-    JSON particleJson = JSON::object ();
-    if (!particleFile.empty ()) {
-        try {
-            particleJson = WallpaperEngine::Data::JSON::JSON::parse (project.assetLocator->readString (particleFile));
-        } catch (std::runtime_error& e) {
-            sLog.error ("Cannot load particle file: ", particleFile, " - ", e.what ());
+        } else if (particleIt->is_object ()) {
+            particleJson = *particleIt;
         }
-    } else if (particleIt->is_object ()) {
-        particleJson = *particleIt;
-    }
 
-    // Parse emitters (note: field is named "emitter" not "emitters")
-    std::vector<ParticleEmitter> emitters;
-    const auto emittersIt = particleJson.find ("emitter");
-    if (emittersIt != particleJson.end () && emittersIt->is_array ()) {
-        for (const auto& emitter : *emittersIt) {
-            emitters.push_back (parseParticleEmitter (emitter));
-        }
-    }
-
-    // Parse initializers (note: field is named "initializer" not "initializers")
-    std::vector<ParticleInitializerUniquePtr> initializers;
-    const auto initializersIt = particleJson.find ("initializer");
-    if (initializersIt != particleJson.end () && initializersIt->is_array ()) {
-        for (const auto& initializer : *initializersIt) {
-            auto init = parseParticleInitializer (initializer, project.properties);
-            if (init) {
-                initializers.push_back (std::move (init));
+        // Parse emitters (note: field is named "emitter" not "emitters")
+        std::vector<ParticleEmitter> emitters;
+        const auto emittersIt = particleJson.find ("emitter");
+        if (emittersIt != particleJson.end () && emittersIt->is_array ()) {
+            for (const auto& emitter : *emittersIt) {
+                emitters.push_back (parseParticleEmitter (emitter));
             }
         }
-    }
 
-    // Parse operators (note: field is named "operator" not "operators")
-    std::vector<ParticleOperatorUniquePtr> operators;
-    const auto operatorsIt = particleJson.find ("operator");
-    if (operatorsIt != particleJson.end () && operatorsIt->is_array ()) {
-        for (const auto& op : *operatorsIt) {
-            auto oper = parseParticleOperator (op, project.properties);
-            if (oper) {
-                operators.push_back (std::move (oper));
+        // Parse initializers (note: field is named "initializer" not "initializers")
+        std::vector<ParticleInitializerUniquePtr> initializers;
+        const auto initializersIt = particleJson.find ("initializer");
+        if (initializersIt != particleJson.end () && initializersIt->is_array ()) {
+            for (const auto& initializer : *initializersIt) {
+                auto init = parseParticleInitializer (initializer, project.properties);
+                if (init) {
+                    initializers.push_back (std::move (init));
+                }
             }
         }
-    }
 
-    // Parse renderers (note: field is named "renderer" not "renderers")
-    std::vector<ParticleRenderer> renderers;
-    const auto renderersIt = particleJson.find ("renderer");
-    if (renderersIt != particleJson.end () && renderersIt->is_array ()) {
-        for (const auto& renderer : *renderersIt) {
-            renderers.push_back (parseParticleRenderer (renderer));
+        // Parse operators (note: field is named "operator" not "operators")
+        std::vector<ParticleOperatorUniquePtr> operators;
+        const auto operatorsIt = particleJson.find ("operator");
+        if (operatorsIt != particleJson.end () && operatorsIt->is_array ()) {
+            for (const auto& op : *operatorsIt) {
+                auto oper = parseParticleOperator (op, project.properties);
+                if (oper) {
+                    operators.push_back (std::move (oper));
+                }
+            }
         }
-    }
 
-    // Add default sprite renderer if none specified
-    if (renderers.empty ()) {
-        renderers.push_back (ParticleRenderer {
-            .name = "sprite",
-            .length = 0.05f,
-            .maxLength = 10.0f,
-            .subdivision = 3.0f,
-        });
-    }
-
-    // Parse control points (note: field is named "controlpoint" not "controlpoints")
-    std::vector<ParticleControlPoint> controlPoints;
-    const auto controlPointsIt = particleJson.find ("controlpoint");
-    if (controlPointsIt != particleJson.end () && controlPointsIt->is_array ()) {
-        for (const auto& cp : *controlPointsIt) {
-            controlPoints.push_back (parseParticleControlPoint (cp));
+        // Parse renderers (note: field is named "renderer" not "renderers")
+        std::vector<ParticleRenderer> renderers;
+        const auto renderersIt = particleJson.find ("renderer");
+        if (renderersIt != particleJson.end () && renderersIt->is_array ()) {
+            for (const auto& renderer : *renderersIt) {
+                renderers.push_back (parseParticleRenderer (renderer));
+            }
         }
-    }
 
-    // Parse children
-    std::vector<ParticleChild> children;
-    const auto childrenIt = particleJson.optional ("children");
-    if (childrenIt.has_value () && childrenIt->is_array ()) {
-        for (const auto& child : *childrenIt) {
-            children.push_back (parseParticleChild (child, project));
-        }
-    }
-
-    // Parse instance override
-    ParticleInstanceOverride instanceOverride = {
-        .enabled = std::make_unique<UserSetting> (UserSetting {
-            .value = std::make_unique<DynamicValue> (false),
-            .property = nullptr,
-            .condition = std::nullopt
-        }),
-        .alpha = std::make_unique<UserSetting> (UserSetting {
-            .value = std::make_unique<DynamicValue> (1.0f),
-            .property = nullptr,
-            .condition = std::nullopt
-        }),
-        .size = std::make_unique<UserSetting> (UserSetting {
-            .value = std::make_unique<DynamicValue> (1.0f),
-            .property = nullptr,
-            .condition = std::nullopt
-        }),
-        .lifetime = std::make_unique<UserSetting> (UserSetting {
-            .value = std::make_unique<DynamicValue> (1.0f),
-            .property = nullptr,
-            .condition = std::nullopt
-        }),
-        .rate = std::make_unique<UserSetting> (UserSetting {
-            .value = std::make_unique<DynamicValue> (1.0f),
-            .property = nullptr,
-            .condition = std::nullopt
-        }),
-        .speed = std::make_unique<UserSetting> (UserSetting {
-            .value = std::make_unique<DynamicValue> (1.0f),
-            .property = nullptr,
-            .condition = std::nullopt
-        }),
-        .count = std::make_unique<UserSetting> (UserSetting {
-            .value = std::make_unique<DynamicValue> (1.0f),
-            .property = nullptr,
-            .condition = std::nullopt
-        }),
-        .color = std::make_unique<UserSetting> (UserSetting {
-            .value = std::make_unique<DynamicValue> (glm::vec3 (1.0f)),
-            .property = nullptr,
-            .condition = std::nullopt
-        }),
-        .colorn = std::make_unique<UserSetting> (UserSetting {
-            .value = std::make_unique<DynamicValue> (glm::vec3 (1.0f)),
-            .property = nullptr,
-            .condition = std::nullopt
-        })
-    };
-    const auto instanceOverrideIt = it.optional ("instanceoverride");
-    if (instanceOverrideIt.has_value ()) {
-        instanceOverride = parseParticleInstanceOverride (*instanceOverrideIt, project.properties);
-    }
-
-    // Parse material - particles reference materials directly, not models
-    ModelUniquePtr material = nullptr;
-    const auto materialIt = particleJson.find ("material");
-    if (materialIt != particleJson.end () && materialIt->is_string ()) {
-        try {
-            std::string materialPath = materialIt->get<std::string> ();
-
-            // Particle materials are stored as just material definitions, not model files
-            // So we need to wrap them in a model structure
-            auto mat = MaterialParser::load (project, materialPath);
-
-            material = std::make_unique <ModelStruct> (ModelStruct {
-                .filename = materialPath,
-                .material = std::move (mat),
-                .solidlayer = false,
-                .fullscreen = false,
-                .passthrough = false,
-                .autosize = false,
-                .nopadding = false,
-                .width = std::nullopt,
-                .height = std::nullopt,
-                .puppet = std::nullopt,
+        // Add default sprite renderer if none specified
+        if (renderers.empty ()) {
+            renderers.push_back (ParticleRenderer {
+                .name = "sprite",
+                .length = 0.05f,
+                .maxLength = 10.0f,
+                .subdivision = 3.0f,
             });
-        } catch (std::runtime_error& e) {
-            sLog.error ("Cannot load particle material: ", materialIt->get<std::string> (), " - ", e.what ());
         }
-    }
 
-    // Parse string fields safely
-    std::string animationMode = "sequence";
-    const auto animModeIt = particleJson.find ("animationmode");
-    if (animModeIt != particleJson.end () && animModeIt->is_string ()) {
-        animationMode = animModeIt->get<std::string> ();
-    }
-
-    // Parse numeric fields safely
-    float sequenceMultiplier = 1.0f;
-    uint32_t maxCount = 100;
-    uint32_t startTime = 0;
-    uint32_t flags = 0;
-
-    const auto seqMultIt = particleJson.find ("sequencemultiplier");
-    if (seqMultIt != particleJson.end () && seqMultIt->is_number ()) {
-        sequenceMultiplier = seqMultIt->get<float> ();
-    }
-
-    const auto maxCountIt = particleJson.find ("maxcount");
-    if (maxCountIt != particleJson.end () && maxCountIt->is_number ()) {
-        maxCount = maxCountIt->get<uint32_t> ();
-    }
-
-    const auto startTimeIt = particleJson.find ("starttime");
-    if (startTimeIt != particleJson.end () && startTimeIt->is_number ()) {
-        startTime = startTimeIt->get<uint32_t> ();
-    }
-
-    const auto flagsIt = particleJson.find ("flags");
-    if (flagsIt != particleJson.end () && flagsIt->is_number ()) {
-        flags = flagsIt->get<uint32_t> ();
-    }
-
-    return std::make_unique <Particle> (
-        std::move (base),
-        ParticleData {
-            .origin = it.user ("origin", properties, glm::vec3 (0.0f)),
-            .scale = it.user ("scale", properties, glm::vec3 (1.0f)),
-            .angles = it.user ("angles", properties, glm::vec3 (0.0f)),
-            .visible = it.user ("visible", properties, true),
-            .parallaxDepth = it.optional ("parallaxDepth", glm::vec2 (0.0f)),
-            .particleFile = particleFile,
-            .animationMode = animationMode,
-            .sequenceMultiplier = sequenceMultiplier,
-            .maxCount = maxCount,
-            .startTime = startTime,
-            .flags = flags,
-            .material = std::move (material),
-            .emitters = std::move (emitters),
-            .initializers = std::move (initializers),
-            .operators = std::move (operators),
-            .renderers = std::move (renderers),
-            .controlPoints = std::move (controlPoints),
-            .children = std::move (children),
-            .instanceOverride = std::move (instanceOverride),
+        // Parse control points (note: field is named "controlpoint" not "controlpoints")
+        std::vector<ParticleControlPoint> controlPoints;
+        const auto controlPointsIt = particleJson.find ("controlpoint");
+        if (controlPointsIt != particleJson.end () && controlPointsIt->is_array ()) {
+            for (const auto& cp : *controlPointsIt) {
+                controlPoints.push_back (parseParticleControlPoint (cp));
+            }
         }
-    );
+
+        // Parse children
+        std::vector<ParticleChild> children;
+        const auto childrenIt = particleJson.optional ("children");
+        if (childrenIt.has_value () && childrenIt->is_array ()) {
+            for (const auto& child : *childrenIt) {
+                children.push_back (parseParticleChild (child, project));
+            }
+        }
+
+        // Parse instance override
+        ParticleInstanceOverride instanceOverride = {
+            .enabled = std::make_unique<UserSetting> (UserSetting {
+                .value = std::make_unique<DynamicValue> (false), .property = nullptr, .condition = std::nullopt}),
+            .alpha = std::make_unique<UserSetting> (UserSetting {
+                .value = std::make_unique<DynamicValue> (1.0f), .property = nullptr, .condition = std::nullopt}),
+            .size = std::make_unique<UserSetting> (UserSetting {
+                .value = std::make_unique<DynamicValue> (1.0f), .property = nullptr, .condition = std::nullopt}),
+            .lifetime = std::make_unique<UserSetting> (UserSetting {
+                .value = std::make_unique<DynamicValue> (1.0f), .property = nullptr, .condition = std::nullopt}),
+            .rate = std::make_unique<UserSetting> (UserSetting {
+                .value = std::make_unique<DynamicValue> (1.0f), .property = nullptr, .condition = std::nullopt}),
+            .speed = std::make_unique<UserSetting> (UserSetting {
+                .value = std::make_unique<DynamicValue> (1.0f), .property = nullptr, .condition = std::nullopt}),
+            .count = std::make_unique<UserSetting> (UserSetting {
+                .value = std::make_unique<DynamicValue> (1.0f), .property = nullptr, .condition = std::nullopt}),
+            .color =
+                std::make_unique<UserSetting> (UserSetting {.value = std::make_unique<DynamicValue> (glm::vec3 (1.0f)),
+                                                            .property = nullptr,
+                                                            .condition = std::nullopt}),
+            .colorn =
+                std::make_unique<UserSetting> (UserSetting {.value = std::make_unique<DynamicValue> (glm::vec3 (1.0f)),
+                                                            .property = nullptr,
+                                                            .condition = std::nullopt})};
+        const auto instanceOverrideIt = it.optional ("instanceoverride");
+        if (instanceOverrideIt.has_value ()) {
+            instanceOverride = parseParticleInstanceOverride (*instanceOverrideIt, project.properties);
+        }
+
+        // Parse material - particles reference materials directly, not models
+        ModelUniquePtr material = nullptr;
+        const auto materialIt = particleJson.find ("material");
+        if (materialIt != particleJson.end () && materialIt->is_string ()) {
+            try {
+                std::string materialPath = materialIt->get<std::string> ();
+
+                // Particle materials are stored as just material definitions, not model files
+                // So we need to wrap them in a model structure
+                auto mat = MaterialParser::load (project, materialPath);
+
+                material = std::make_unique<ModelStruct> (ModelStruct {
+                    .filename = materialPath,
+                    .material = std::move (mat),
+                    .solidlayer = false,
+                    .fullscreen = false,
+                    .passthrough = false,
+                    .autosize = false,
+                    .nopadding = false,
+                    .width = std::nullopt,
+                    .height = std::nullopt,
+                    .puppet = std::nullopt,
+                });
+            } catch (std::runtime_error& e) {
+                sLog.error ("Cannot load particle material: ", materialIt->get<std::string> (), " - ", e.what ());
+            }
+        }
+
+        // Parse string fields safely
+        std::string animationMode = "sequence";
+        const auto animModeIt = particleJson.find ("animationmode");
+        if (animModeIt != particleJson.end () && animModeIt->is_string ()) {
+            animationMode = animModeIt->get<std::string> ();
+        }
+
+        // Parse numeric fields safely
+        float sequenceMultiplier = 1.0f;
+        uint32_t maxCount = 100;
+        uint32_t startTime = 0;
+        uint32_t flags = 0;
+
+        const auto seqMultIt = particleJson.find ("sequencemultiplier");
+        if (seqMultIt != particleJson.end () && seqMultIt->is_number ()) {
+            sequenceMultiplier = seqMultIt->get<float> ();
+        }
+
+        const auto maxCountIt = particleJson.find ("maxcount");
+        if (maxCountIt != particleJson.end () && maxCountIt->is_number ()) {
+            maxCount = maxCountIt->get<uint32_t> ();
+        }
+
+        const auto startTimeIt = particleJson.find ("starttime");
+        if (startTimeIt != particleJson.end () && startTimeIt->is_number ()) {
+            startTime = startTimeIt->get<uint32_t> ();
+        }
+
+        const auto flagsIt = particleJson.find ("flags");
+        if (flagsIt != particleJson.end () && flagsIt->is_number ()) {
+            flags = flagsIt->get<uint32_t> ();
+        }
+
+        return std::make_unique<Particle> (std::move (base),
+                                           ParticleData {
+                                               .origin = it.user ("origin", properties, glm::vec3 (0.0f)),
+                                               .scale = it.user ("scale", properties, glm::vec3 (1.0f)),
+                                               .angles = it.user ("angles", properties, glm::vec3 (0.0f)),
+                                               .visible = it.user ("visible", properties, true),
+                                               .parallaxDepth = it.optional ("parallaxDepth", glm::vec2 (0.0f)),
+                                               .particleFile = particleFile,
+                                               .animationMode = animationMode,
+                                               .sequenceMultiplier = sequenceMultiplier,
+                                               .maxCount = maxCount,
+                                               .startTime = startTime,
+                                               .flags = flags,
+                                               .material = std::move (material),
+                                               .emitters = std::move (emitters),
+                                               .initializers = std::move (initializers),
+                                               .operators = std::move (operators),
+                                               .renderers = std::move (renderers),
+                                               .controlPoints = std::move (controlPoints),
+                                               .children = std::move (children),
+                                               .instanceOverride = std::move (instanceOverride),
+                                           });
     } catch (nlohmann::json::exception& e) {
         sLog.error ("Error parsing particle '", base.name, "': ", e.what ());
         sLog.error ("Particle JSON: ", it.dump ());
@@ -528,7 +527,7 @@ ParticleEmitter ObjectParser::parseParticleEmitter (const JSON& it) {
     }
 
     // Helper lambda to parse vec3 fields that might be strings, arrays, single numbers, or missing
-    auto parseVec3 = [&](const char* fieldName, const glm::vec3& defaultValue) -> glm::vec3 {
+    auto parseVec3 = [&] (const char* fieldName, const glm::vec3& defaultValue) -> glm::vec3 {
         const auto fieldIt = it.find (fieldName);
         if (fieldIt == it.end ()) {
             return defaultValue;
@@ -542,26 +541,18 @@ ParticleEmitter ObjectParser::parseParticleEmitter (const JSON& it) {
             return glm::vec3 (val, val, val);
         }
         if (fieldIt->is_array () && fieldIt->size () >= 3) {
-            return glm::vec3 (
-                (*fieldIt)[0].get<float> (),
-                (*fieldIt)[1].get<float> (),
-                (*fieldIt)[2].get<float> ()
-            );
+            return glm::vec3 ((*fieldIt) [0].get<float> (), (*fieldIt) [1].get<float> (), (*fieldIt) [2].get<float> ());
         }
         return defaultValue;
     };
 
-    auto parseIVec3 = [&](const char* fieldName, const glm::ivec3& defaultValue) -> glm::ivec3 {
+    auto parseIVec3 = [&] (const char* fieldName, const glm::ivec3& defaultValue) -> glm::ivec3 {
         const auto fieldIt = it.find (fieldName);
         if (fieldIt == it.end ()) {
             return defaultValue;
         }
         if (fieldIt->is_array () && fieldIt->size () >= 3) {
-            return glm::ivec3 (
-                (*fieldIt)[0].get<int> (),
-                (*fieldIt)[1].get<int> (),
-                (*fieldIt)[2].get<int> ()
-            );
+            return glm::ivec3 ((*fieldIt) [0].get<int> (), (*fieldIt) [1].get<int> (), (*fieldIt) [2].get<int> ());
         }
         return defaultValue;
     };
@@ -598,63 +589,45 @@ ParticleInitializerUniquePtr ObjectParser::parseParticleInitializer (const JSON&
         auto maxSetting = it.user ("max", properties, glm::vec3 (255.0f));
 
         auto minVec = minSetting->value->getVec3 ();
-        if (minSetting->property == nullptr &&
-            (minVec.x > 1.0f || minVec.y > 1.0f || minVec.z > 1.0f)) {
+        if (minSetting->property == nullptr && (minVec.x > 1.0f || minVec.y > 1.0f || minVec.z > 1.0f)) {
             minSetting->value->update (minVec / 255.0f);
         }
 
         auto maxVec = maxSetting->value->getVec3 ();
-        if (maxSetting->property == nullptr &&
-            (maxVec.x > 1.0f || maxVec.y > 1.0f || maxVec.z > 1.0f)) {
+        if (maxSetting->property == nullptr && (maxVec.x > 1.0f || maxVec.y > 1.0f || maxVec.z > 1.0f)) {
             maxSetting->value->update (maxVec / 255.0f);
         }
 
         return std::make_unique<ColorRandomInitializer> (std::move (minSetting), std::move (maxSetting));
     } else if (name == "sizerandom") {
-        return std::make_unique<SizeRandomInitializer> (
-            it.user ("min", properties, 0.0f),
-            it.user ("max", properties, 20.0f),
-            it.user ("exponent", properties, 1.0f)
-        );
+        return std::make_unique<SizeRandomInitializer> (it.user ("min", properties, 0.0f),
+                                                        it.user ("max", properties, 20.0f),
+                                                        it.user ("exponent", properties, 1.0f));
     } else if (name == "alpharandom") {
-        return std::make_unique<AlphaRandomInitializer> (
-            it.user ("min", properties, 0.05f),
-            it.user ("max", properties, 1.0f)
-        );
+        return std::make_unique<AlphaRandomInitializer> (it.user ("min", properties, 0.05f),
+                                                         it.user ("max", properties, 1.0f));
     } else if (name == "lifetimerandom") {
-        return std::make_unique<LifetimeRandomInitializer> (
-            it.user ("min", properties, 0.0f),
-            it.user ("max", properties, 1.0f)
-        );
+        return std::make_unique<LifetimeRandomInitializer> (it.user ("min", properties, 0.0f),
+                                                            it.user ("max", properties, 1.0f));
     } else if (name == "velocityrandom") {
-        return std::make_unique<VelocityRandomInitializer> (
-            it.user ("min", properties, glm::vec3 (-32.0f)),
-            it.user ("max", properties, glm::vec3 (32.0f))
-        );
+        return std::make_unique<VelocityRandomInitializer> (it.user ("min", properties, glm::vec3 (-32.0f)),
+                                                            it.user ("max", properties, glm::vec3 (32.0f)));
     } else if (name == "rotationrandom") {
         return std::make_unique<RotationRandomInitializer> (
             it.user ("min", properties, glm::vec3 (0.0f)),
-            it.user ("max", properties, glm::vec3 (0.0f, 0.0f, glm::two_pi<float>()))
-        );
+            it.user ("max", properties, glm::vec3 (0.0f, 0.0f, glm::two_pi<float> ())));
     } else if (name == "angularvelocityrandom") {
         return std::make_unique<AngularVelocityRandomInitializer> (
             it.user ("min", properties, glm::vec3 (0.0f, 0.0f, -5.0f)),
-            it.user ("max", properties, glm::vec3 (0.0f, 0.0f, 5.0f))
-        );
+            it.user ("max", properties, glm::vec3 (0.0f, 0.0f, 5.0f)));
     } else if (name == "turbulentvelocityrandom") {
         return std::make_unique<TurbulentVelocityRandomInitializer> (
-            it.user ("speedmin", properties, 0.0f),
-            it.user ("speedmax", properties, 100.0f),
-            it.user ("scale", properties, 1.0f),
-            it.user ("offset", properties, 0.0f)
-        );
+            it.user ("speedmin", properties, 0.0f), it.user ("speedmax", properties, 100.0f),
+            it.user ("scale", properties, 1.0f), it.user ("offset", properties, 0.0f));
     } else if (name == "mapsequencearoundcontrolpoint") {
         return std::make_unique<MapSequenceAroundControlPointInitializer> (
-            it.user ("controlpoint", properties, 0),
-            it.user ("count", properties, 1),
-            it.user ("speedmin", properties, glm::vec3 (0.0f)),
-            it.user ("speedmax", properties, glm::vec3 (100.0f))
-        );
+            it.user ("controlpoint", properties, 0), it.user ("count", properties, 1),
+            it.user ("speedmin", properties, glm::vec3 (0.0f)), it.user ("speedmax", properties, glm::vec3 (100.0f)));
     }
 
     return nullptr;
@@ -664,70 +637,45 @@ ParticleOperatorUniquePtr ObjectParser::parseParticleOperator (const JSON& it, c
     std::string name = it.optional<std::string> ("name", "");
 
     if (name == "movement") {
-        return std::make_unique<MovementOperator> (
-            it.user ("drag", properties, 0.0f),
-            it.user ("gravity", properties, glm::vec3 (0.0f))
-        );
+        return std::make_unique<MovementOperator> (it.user ("drag", properties, 0.0f),
+                                                   it.user ("gravity", properties, glm::vec3 (0.0f)));
     } else if (name == "angularmovement") {
-        return std::make_unique<AngularMovementOperator> (
-            it.user ("drag", properties, 0.0f),
-            it.user ("force", properties, glm::vec3 (0.0f))
-        );
+        return std::make_unique<AngularMovementOperator> (it.user ("drag", properties, 0.0f),
+                                                          it.user ("force", properties, glm::vec3 (0.0f)));
     } else if (name == "alphafade") {
-        return std::make_unique<AlphaFadeOperator> (
-            it.user ("fadeintime", properties, 0.5f),
-            it.user ("fadeouttime", properties, 0.5f)
-        );
+        return std::make_unique<AlphaFadeOperator> (it.user ("fadeintime", properties, 0.5f),
+                                                    it.user ("fadeouttime", properties, 0.5f));
     } else if (name == "sizechange") {
         return std::make_unique<SizeChangeOperator> (
-            it.user ("starttime", properties, 0.0f),
-            it.user ("endtime", properties, 1.0f),
-            it.user ("startvalue", properties, 1.0f),
-            it.user ("endvalue", properties, 0.0f)
-        );
+            it.user ("starttime", properties, 0.0f), it.user ("endtime", properties, 1.0f),
+            it.user ("startvalue", properties, 1.0f), it.user ("endvalue", properties, 0.0f));
     } else if (name == "alphachange") {
         return std::make_unique<AlphaChangeOperator> (
-            it.user ("starttime", properties, 0.0f),
-            it.user ("endtime", properties, 1.0f),
-            it.user ("startvalue", properties, 1.0f),
-            it.user ("endvalue", properties, 0.0f)
-        );
+            it.user ("starttime", properties, 0.0f), it.user ("endtime", properties, 1.0f),
+            it.user ("startvalue", properties, 1.0f), it.user ("endvalue", properties, 0.0f));
     } else if (name == "colorchange") {
         return std::make_unique<ColorChangeOperator> (
-            it.user ("starttime", properties, 0.0f),
-            it.user ("endtime", properties, 1.0f),
-            it.user ("startvalue", properties, glm::vec3 (1.0f)),
-            it.user ("endvalue", properties, glm::vec3 (1.0f))
-        );
+            it.user ("starttime", properties, 0.0f), it.user ("endtime", properties, 1.0f),
+            it.user ("startvalue", properties, glm::vec3 (1.0f)), it.user ("endvalue", properties, glm::vec3 (1.0f)));
     } else if (name == "turbulence") {
         return std::make_unique<TurbulenceOperator> (
-            it.user ("scale", properties, 0.005f),
-            it.user ("speedmin", properties, 0.0f),
-            it.user ("speedmax", properties, 1000.0f),
-            it.user ("timescale", properties, 1.0f),
-            it.user ("audioprocessingmode", properties, 0),  // 0 = no audio processing
-            it.user ("audioprocessingbounds", properties, glm::vec2(0.0f, 1.0f)),
-            it.user ("audioprocessingfrequencyend", properties, 64)  // Default to full spectrum
+            it.user ("scale", properties, 0.005f), it.user ("speedmin", properties, 0.0f),
+            it.user ("speedmax", properties, 1000.0f), it.user ("timescale", properties, 1.0f),
+            it.user ("audioprocessingmode", properties, 0), // 0 = no audio processing
+            it.user ("audioprocessingbounds", properties, glm::vec2 (0.0f, 1.0f)),
+            it.user ("audioprocessingfrequencyend", properties, 64) // Default to full spectrum
         );
     } else if (name == "vortex") {
         return std::make_unique<VortexOperator> (
-            it.optional ("controlpoint", 0),
-            it.user ("axis", properties, glm::vec3 (0.0f, 0.0f, 1.0f)),
-            it.user ("offset", properties, glm::vec3 (0.0f)),
-            it.user ("distanceinner", properties, 0.0f),
-            it.user ("distanceouter", properties, 1000.0f),
-            it.user ("speedinner", properties, 100.0f),
-            it.user ("speedouter", properties, 0.0f),
-            it.user ("audioprocessingmode", properties, 0),
-            it.user ("audioprocessingbounds", properties, glm::vec2(0.0f, 1.0f))
-        );
+            it.optional ("controlpoint", 0), it.user ("axis", properties, glm::vec3 (0.0f, 0.0f, 1.0f)),
+            it.user ("offset", properties, glm::vec3 (0.0f)), it.user ("distanceinner", properties, 0.0f),
+            it.user ("distanceouter", properties, 1000.0f), it.user ("speedinner", properties, 100.0f),
+            it.user ("speedouter", properties, 0.0f), it.user ("audioprocessingmode", properties, 0),
+            it.user ("audioprocessingbounds", properties, glm::vec2 (0.0f, 1.0f)));
     } else if (name == "controlpointattract") {
         return std::make_unique<ControlPointAttractOperator> (
-            it.optional ("controlpoint", 0),
-            it.user ("origin", properties, glm::vec3 (0.0f)),
-            it.user ("scale", properties, 100.0f),
-            it.user ("threshold", properties, 1000.0f)
-        );
+            it.optional ("controlpoint", 0), it.user ("origin", properties, glm::vec3 (0.0f)),
+            it.user ("scale", properties, 100.0f), it.user ("threshold", properties, 1000.0f));
     }
 
     return nullptr;
@@ -796,7 +744,7 @@ ParticleChild ObjectParser::parseParticleChild (const JSON& it, const Project& p
     }
 
     // Helper lambda to parse vec3 fields that might be strings, arrays, single numbers, or missing
-    auto parseVec3 = [&](const char* fieldName, const glm::vec3& defaultValue) -> glm::vec3 {
+    auto parseVec3 = [&] (const char* fieldName, const glm::vec3& defaultValue) -> glm::vec3 {
         const auto fieldIt = it.find (fieldName);
         if (fieldIt == it.end ()) {
             return defaultValue;
@@ -810,11 +758,7 @@ ParticleChild ObjectParser::parseParticleChild (const JSON& it, const Project& p
             return glm::vec3 (val, val, val);
         }
         if (fieldIt->is_array () && fieldIt->size () >= 3) {
-            return glm::vec3 (
-                (*fieldIt)[0].get<float> (),
-                (*fieldIt)[1].get<float> (),
-                (*fieldIt)[2].get<float> ()
-            );
+            return glm::vec3 ((*fieldIt) [0].get<float> (), (*fieldIt) [1].get<float> (), (*fieldIt) [2].get<float> ());
         }
         return defaultValue;
     };

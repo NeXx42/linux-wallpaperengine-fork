@@ -1,10 +1,8 @@
 #include "AudioDriver.h"
 
 namespace WallpaperEngine::Audio::Drivers {
-AudioDriver::AudioDriver (
-    Application::ApplicationContext& applicationContext, Detectors::AudioPlayingDetector& detector,
-    Recorders::PlaybackRecorder& recorder
-) :
+AudioDriver::AudioDriver (Application::ApplicationContext& applicationContext,
+                          Detectors::AudioPlayingDetector& detector, Recorders::PlaybackRecorder& recorder) :
     m_applicationContext (applicationContext),
     m_detector (detector),
     m_recorder (recorder) {}

@@ -14,7 +14,7 @@ class WallpaperApplication;
 namespace WallpaperEngine::Input {
 class InputContext;
 class CWaylandMouseInput;
-}
+} // namespace WallpaperEngine::Input
 
 namespace WallpaperEngine::Render::Drivers {
 namespace Detectors {

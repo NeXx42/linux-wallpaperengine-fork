@@ -13,7 +13,7 @@ class SubprocessApp : public CefApp {
   public:
     explicit SubprocessApp (WallpaperEngine::Application::WallpaperApplication& application);
 
-    void OnRegisterCustomSchemes (CefRawPtr <CefSchemeRegistrar> registrar) override;
+    void OnRegisterCustomSchemes (CefRawPtr<CefSchemeRegistrar> registrar) override;
 
   protected:
     const WallpaperEngine::Application::WallpaperApplication& getApplication () const;
@@ -25,4 +25,4 @@ class SubprocessApp : public CefApp {
     IMPLEMENT_REFCOUNTING (SubprocessApp);
     DISALLOW_COPY_AND_ASSIGN (SubprocessApp);
 };
-}
+} // namespace WallpaperEngine::WebBrowser::CEF

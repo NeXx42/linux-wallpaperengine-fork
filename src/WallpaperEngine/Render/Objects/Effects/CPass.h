@@ -22,11 +22,10 @@ using namespace WallpaperEngine::Data::Model;
 
 class CPass final : public Helpers::ContextAware {
   public:
-    CPass (
-        CImage& image, std::shared_ptr<const FBOProvider> fboProvider, const MaterialPass& pass,
-        std::optional<std::reference_wrapper<const ImageEffectPassOverride>> override,
-        std::optional<std::reference_wrapper<const TextureMap>> binds,
-        std::optional<std::reference_wrapper<std::string>> target);
+    CPass (CImage& image, std::shared_ptr<const FBOProvider> fboProvider, const MaterialPass& pass,
+           std::optional<std::reference_wrapper<const ImageEffectPassOverride>> override,
+           std::optional<std::reference_wrapper<const TextureMap>> binds,
+           std::optional<std::reference_wrapper<std::string>> target);
 
     void render ();
 
@@ -151,7 +150,8 @@ class CPass final : public Helpers::ContextAware {
     void renderGeometry () const;
     void cleanupRenderSetup ();
 
-    std::shared_ptr<const TextureProvider> resolveTexture (std::shared_ptr<const TextureProvider> expected, int index, std::shared_ptr<const TextureProvider> previous = nullptr);
+    std::shared_ptr<const TextureProvider> resolveTexture (std::shared_ptr<const TextureProvider> expected, int index,
+                                                           std::shared_ptr<const TextureProvider> previous = nullptr);
 
     CImage& m_image;
     std::shared_ptr<const FBOProvider> m_fboProvider;

@@ -5,6 +5,7 @@
 namespace WallpaperEngine::Assets {
 using namespace WallpaperEngine::FileSystem;
 using namespace WallpaperEngine::Data::Model;
+
 class AssetLocator {
   public:
     explicit AssetLocator (ContainerUniquePtr filesystem);
@@ -24,4 +25,4 @@ class AssetLocator {
 };
 
 using AssetLocatorUniquePtr = std::unique_ptr<AssetLocator>;
-}
+} // namespace WallpaperEngine::Assets

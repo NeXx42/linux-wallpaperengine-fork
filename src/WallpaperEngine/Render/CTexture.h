@@ -59,4 +59,4 @@ class CTexture final : public TextureProvider {
     /** Resolution vector of the texture */
     glm::vec4 m_resolution {};
 };
-} // namespace WallpaperEngine::Assets
+} // namespace WallpaperEngine::Render

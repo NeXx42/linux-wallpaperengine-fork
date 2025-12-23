@@ -1,13 +1,13 @@
 #include "UserSettingParser.h"
 
-#include "WallpaperEngine/Data/Model/UserSetting.h"
 #include "WallpaperEngine/Data/Model/Property.h"
+#include "WallpaperEngine/Data/Model/UserSetting.h"
 
 using namespace WallpaperEngine::Data::Parsers;
 using namespace WallpaperEngine::Data::Builders;
 
 UserSettingUniquePtr UserSettingParser::parse (const json& data, const Properties& properties) {
-    auto value = std::make_unique <DynamicValue> ();
+    auto value = std::make_unique<DynamicValue> ();
     PropertySharedPtr property;
     std::optional<ConditionInfo> condition;
     auto valueIt = data;
@@ -30,8 +30,9 @@ UserSettingUniquePtr UserSettingParser::parse (const json& data, const Propertie
                 source = it;
             } else {
                 condition = ConditionInfo {
-                    .name = it.require <std::string> ("name", "Name for conditional setting must be present"),
-                    .condition = it.require <std::string> ("condition", "Condition for conditional setting must be present"),
+                    .name = it.require<std::string> ("name", "Name for conditional setting must be present"),
+                    .condition =
+                        it.require<std::string> ("condition", "Condition for conditional setting must be present"),
                 };
 
                 source = condition.value ().name;
@@ -56,11 +57,11 @@ UserSettingUniquePtr UserSettingParser::parse (const json& data, const Propertie
             value->update (static_cast<glm::vec4> (valueIt));
         }
     } else if (valueIt.is_number_integer ()) {
-        value->update (valueIt.get <int> ());
+        value->update (valueIt.get<int> ());
     } else if (valueIt.is_number_float ()) {
-        value->update (valueIt.get <float> ());
+        value->update (valueIt.get<float> ());
     } else if (valueIt.is_boolean ()) {
-        value->update (valueIt.get <bool> ());
+        value->update (valueIt.get<bool> ());
     } else if (valueIt.is_null ()) {
         // null value with no connection to property
         value->update ();
@@ -73,10 +74,10 @@ UserSettingUniquePtr UserSettingParser::parse (const json& data, const Propertie
             value->attachCondition (condition.value ());
         }
 
-        value->connect (property.get());
+        value->connect (property.get ());
     }
 
-    return std::make_unique <UserSetting> (UserSetting {
+    return std::make_unique<UserSetting> (UserSetting {
         .value = std::move (value),
         .property = property,
         .condition = condition,

@@ -18,9 +18,8 @@ namespace Audio::Drivers::Detectors {
  */
 class AudioPlayingDetector {
   public:
-    AudioPlayingDetector (
-        Application::ApplicationContext& appContext,
-        const Render::Drivers::Detectors::FullScreenDetector& fullscreenDetector);
+    AudioPlayingDetector (Application::ApplicationContext& appContext,
+                          const Render::Drivers::Detectors::FullScreenDetector& fullscreenDetector);
 
     virtual ~AudioPlayingDetector () = default;
 

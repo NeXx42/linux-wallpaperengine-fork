@@ -1,14 +1,14 @@
 #pragma once
 
+#include "WallpaperEngine/Data/Model/Object.h"
 #include "WallpaperEngine/Render/CObject.h"
 #include "WallpaperEngine/Render/Wallpapers/CScene.h"
-#include "WallpaperEngine/Data/Model/Object.h"
 
+#include <functional>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
-#include <vector>
 #include <random>
-#include <functional>
+#include <vector>
 
 using namespace WallpaperEngine;
 using namespace WallpaperEngine::Render;
@@ -36,14 +36,14 @@ struct ParticleInstance {
     glm::vec3 color {1.0f};
     float alpha {1.0f};
     float size {20.0f};
-    float frame {0.0f};         // Current animation frame
+    float frame {0.0f}; // Current animation frame
 
     // Lifetime
-    float lifetime {1.0f};      // Total lifetime in seconds
-    float age {0.0f};           // Current age in seconds
+    float lifetime {1.0f}; // Total lifetime in seconds
+    float age {0.0f};      // Current age in seconds
 
     // Turbulent velocity state
-    glm::vec3 noisePos {0.0f};  // Position in noise field for turbulent velocity
+    glm::vec3 noisePos {0.0f}; // Position in noise field for turbulent velocity
 
     // Initial values for resets/multipliers
     struct {
@@ -78,17 +78,18 @@ struct ControlPointData {
 /**
  * Particle emitter function
  */
-using EmitterFunc = std::function<void(std::vector<ParticleInstance>&, uint32_t&, float)>;
+using EmitterFunc = std::function<void (std::vector<ParticleInstance>&, uint32_t&, float)>;
 
 /**
  * Particle initializer function
  */
-using InitializerFunc = std::function<void(ParticleInstance&)>;
+using InitializerFunc = std::function<void (ParticleInstance&)>;
 
 /**
  * Particle operator function
  */
-using OperatorFunc = std::function<void(std::vector<ParticleInstance>&, uint32_t, const std::vector<ControlPointData>&, float, float)>;
+using OperatorFunc =
+    std::function<void (std::vector<ParticleInstance>&, uint32_t, const std::vector<ControlPointData>&, float, float)>;
 
 class CParticle final : public CObject {
     friend CObject;
@@ -121,7 +122,8 @@ class CParticle final : public CObject {
     InitializerFunc createRotationRandomInitializer (const RotationRandomInitializer& init);
     InitializerFunc createAngularVelocityRandomInitializer (const AngularVelocityRandomInitializer& init);
     InitializerFunc createTurbulentVelocityRandomInitializer (const TurbulentVelocityRandomInitializer& init);
-    InitializerFunc createMapSequenceAroundControlPointInitializer (const MapSequenceAroundControlPointInitializer& init);
+    InitializerFunc createMapSequenceAroundControlPointInitializer (
+        const MapSequenceAroundControlPointInitializer& init);
 
     // Operator creators
     OperatorFunc createMovementOperator (const MovementOperator& op);
@@ -185,7 +187,7 @@ class CParticle final : public CObject {
     float m_spritesheetDuration {1.0f};
 
     // Material shader constants
-    float m_overbright {1.0f};  // Brightness multiplier for additive particles
+    float m_overbright {1.0f}; // Brightness multiplier for additive particles
 
     // Renderer configuration
     bool m_useTrailRenderer {false};

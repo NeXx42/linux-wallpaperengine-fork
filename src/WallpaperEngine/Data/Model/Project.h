@@ -1,13 +1,14 @@
 #pragma once
 
-#include <string>
 #include <memory>
+#include <string>
 
 #include "Types.h"
 #include "WallpaperEngine/Assets/AssetLocator.h"
 
 namespace WallpaperEngine::Data::Model {
 using namespace WallpaperEngine::Assets;
+
 /**
  * Represents a wallpaper engine project
  */
@@ -34,4 +35,4 @@ struct Project {
     /** Abstraction over asset loading to provide access to them */
     AssetLocatorUniquePtr assetLocator;
 };
-};
+}; // namespace WallpaperEngine::Data::Model
