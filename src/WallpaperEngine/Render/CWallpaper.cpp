@@ -184,11 +184,14 @@ void CWallpaper::setupShaders () {
     // set shader properties
     auto u_Saturation = glGetUniformLocation (this->m_shader, "u_Saturation");
     auto u_Contrast = glGetUniformLocation (this->m_shader, "u_Contrast");
+    auto u_BorderColour = glGetUniformLocation (this->m_shader, "u_BorderColour");
 
     glUseProgram (this->m_shader);
 
     glUniform1f (u_Saturation, this->m_shaderSettings.saturation);
     glUniform1f (u_Contrast, this->m_shaderSettings.contrast);
+    glUniform3f (u_BorderColour, this->m_shaderSettings.borderColour.x, this->m_shaderSettings.borderColour.y,
+                 this->m_shaderSettings.borderColour.z);
 }
 
 void CWallpaper::setDestinationFramebuffer (GLuint framebuffer) {

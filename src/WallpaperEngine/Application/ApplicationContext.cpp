@@ -500,6 +500,16 @@ void ApplicationContext::loadSettingsFromArgv () {
         .help ("Saturation of the backgrounds")
         .default_value<float> (1.0)
         .store_into (this->settings.render.shader.saturation);
+    configurationGroup.add_argument ("--border-colour")
+        .help ("The background colour when using border clamp")
+        .action ([this] (const std::string& value) -> void {
+            size_t pos1 = value.find (',');
+            size_t pos2 = value.find (',', pos1 + 1);
+
+            this->settings.render.shader.borderColour.x = std::stof (value.substr (0, pos1));
+            this->settings.render.shader.borderColour.y = std::stof (value.substr (pos1 + 1, pos2 - pos1 - 1));
+            this->settings.render.shader.borderColour.z = std::stof (value.substr (pos2 + 1));
+        });
 
     configurationGroup.add_argument ("-l", "--list-properties")
         .help ("List all the available properties and their configuration")
