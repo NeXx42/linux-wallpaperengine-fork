@@ -1,3 +1,13 @@
+A fork of https://github.com/Almamu/linux-wallpaperengine. The intention of the fork is to allow for features replicating the windows version. 
+Features are accessible through the GUI - https://github.com/NeXx42/linux-wallpaperengine-gui
+
+
+<br>
+<br>
+<br>
+
+
+
 <p align="center">
 	<a href="https://github.com/Almamu/linux-wallpaperengine/blob/main/LICENSE"><img src="https://img.shields.io/github/license/Almamu/linux-wallpaperengine" /></a>
     <a href="https://github.com/Almamu/linux-wallpaperengine/actions?query=branch%3Amain"><img src="https://img.shields.io/github/actions/workflow/status/Almamu/linux-wallpaperengine/cmake.yml?branch=main" /></a>
