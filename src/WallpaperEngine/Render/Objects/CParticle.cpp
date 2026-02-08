@@ -1639,6 +1639,16 @@ void CParticle::renderSprites () {
     glPushDebugGroup (GL_DEBUG_SOURCE_APPLICATION, 0, -1, str.c_str ());
 #endif
 
+#if !NDEBUG
+
+    std::string str = "Rendering particles ";
+
+    str += this->getParticle ().name + " (" + std::to_string (this->getId ()) + ", " + this->getParticle ().particleFile
+	+ ")";
+
+    glPushDebugGroup (GL_DEBUG_SOURCE_APPLICATION, 0, -1, str.c_str ());
+#endif
+
     // Save current GL state before any modifications
     GLint prevProgram = 0;
     GLint prevVAO = 0;
